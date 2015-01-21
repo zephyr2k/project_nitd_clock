@@ -1,0 +1,33 @@
+/*// for(int k=0;k < plMain->M ;k++)
+        {
+        cout<<"\n\t\t"<<k;
+        PList *temp=plMain->direct[k].head;
+        cout<<"2nd it";
+        schedule_op(sch,temp,CStep);
+
+        printf("\n\t %d\n",plMain->M);
+       // cout<<"\nBEFORE\n";
+
+        //plMain->toString();
+        plMain->direct[k].head=delete_(temp,temp);
+        //cout<<"AFTER\n";
+        //plMain->toString();
+        cout<<"ahaan";
+        }
+        /*for(int k=0;k<plMain->M;k++)
+        {
+            printf("H 2  %d\t",k);
+            for(int f_unit=0;f_unit<k;f_unit++)
+            {
+               // printf("H 3\t");
+                if(plMain->direct[k].head!=NULL)
+                {
+                    schedule_op(sch,plMain->direct[k].head,CStep);
+                    plMain->direct[k].head=delete_(plMain->direct[k].head,plMain->direct[k].head);
+                    printf("Scheduling %d<%d> at step %d\n",plMain->direct[k].head->vertex_no,plMain->direct[k].head->mobility,CStep);
+                }
+            }
+            cout<<"\n";
+        }*/
+        */
+        
