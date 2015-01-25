@@ -21,12 +21,12 @@ BUGS
 #include<iostream>
 #include<malloc.h>
 #include<vector>
-#include<string>
+#include<cstring>
 #include<stdlib.h>
 #include<stack>
 
 //#define DEBUG
-//#define HAL
+#define HAL
 
 #define MAX_LT 100
 
@@ -383,7 +383,8 @@ void createSchDot(Schedule *sch,int param)
     FILE *fp;
     char ch;
     fp=fopen("schedule.txt","w");
-    fprintf(fp,"// Schedule : Vertex Number < Mobility > Control Step \n");
+    fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step \n");
+
     //fprintf(fp, "digraph "" {\n");
     for (int v = 0; v < sch->n_ops; ++v)
     {
@@ -627,12 +628,12 @@ int HAL_Bench()
     ListSchedulingUtil(graph,hw_constraints,ops);
     return 0;
 }
-int main()
+int main(int argv)
 {
     cout<<"\n";
-    #ifdef HAL
+    if(argv==1)
         HAL_Bench();
-    #endif // HAL_L
+    //#endif // HAL_L
 
     cout<<"\n";
 return 0;

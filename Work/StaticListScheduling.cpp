@@ -438,7 +438,7 @@ return 0;
 int checkPred(Graph *graph,int v,Schedule *s)
 {
     //return true for empty predecessors
-     AdjListNode* p = graph->pre_non_d[v].head;
+     /*AdjListNode* p = graph->pre_non_d[v].head;
      if(p==NULL)
      {
         return SUCCESS;
@@ -451,6 +451,7 @@ int checkPred(Graph *graph,int v,Schedule *s)
                 }
         p=p->next;
         }
+        */
     return SUCCESS;
 }
 ///
@@ -460,7 +461,7 @@ int staticListScheduling(sTable *table,Schedule *sch)
 {
     int vSch=0,cStep=-1;
     vector < vector<int> > hasSch(1,vector<int>(sch->n_ops,0));
-    while(vSch!=table->N)
+    /*while(vSch!=table->N)
     {
         cStep+=1;
         //hasSch.push_back(vector<int> )
@@ -476,7 +477,7 @@ int staticListScheduling(sTable *table,Schedule *sch)
                 }
             }
         }
-    }
+    }*/
 return 0;
 }
 int staticListSchedulingUtil(Graph *graph,char *hw_constraints,char *ops)
