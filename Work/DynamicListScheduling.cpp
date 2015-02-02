@@ -20,12 +20,13 @@ BUGS
 
 #include<iostream>
 #include<malloc.h>
-#include<vector>
+
 #include<cstring>
 #include<stdlib.h>
 #include<stack>
-
-//#define DEBUG
+#include<fstream>
+#include<cstring>
+#define DEBUG
 #define HAL
 
 #define MAX_LT 100
@@ -36,24 +37,7 @@ using namespace std;
 /// PList Node Structure for Scheduling
 ///
 
-void addEdge(Graph* graph, int src, int dest)
-{
-    // Add an edge from src to dest.  A new node is added to the adjacency
-    // list of src.  The node is added at the begining
-    AdjListNode* newNode = newAdjListNode(dest);
-    newNode->next = graph->su[src].head;
-    graph->su[src].head = newNode;
 
-    // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre[dest].head;
-    graph->pre[dest].head = newNode;
-
-    // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre_non_d[dest].head;
-    graph->pre_non_d[dest].head = newNode;
-}
 
 /*** Allocates mobility to vertices after computation ***/
 int alloc_op_mbty(Graph* graph,char *op,int *arr)
@@ -68,60 +52,7 @@ int alloc_op_mbty(Graph* graph,char *op,int *arr)
     }
     return 1;
 }
-/** Inserts PListNode k in PList p, using 'x' as cStep parameter **/
-PList* insert_PList(PList *p,PList *k,int x)
-{
-    int t=0;
-    if(p->cStep==-1)
-    {
-        p=k;t=1;
-    }
-    else if(p->next==NULL)
-    {
-        if(k->cStep>p->cStep)
-        {
-            p->next=k;
-        }
-        else
-        {
-            k->next=p;
-            p=k;
-        }
-        t=1;
-    }
-        PList *prev=p;
-        PList *curr=p->next;
-        /*Code to insert a node by comparing cStep*/
-        while(curr!=NULL)
-        {
-            if(curr->cStep>x)// IMP
-            {
-                prev->next=k;
-                k->next=curr;
-                break;
-            }
-            prev=curr;
-            curr=curr->next;
 
-        }
-    if(t==0)
-    {
-        prev->next=k;
-    }
-    k->cStep=x;
-    return p;
-}
-/** Takes a Schedule , inserts tk at Cstep of funit hardware **/
-int schedule_op(Schedule *S,PList *tk,int Cstep,int funit)
-{
-        int loc=funit;
-        if(loc>=0)
-        {
-            S->pOps[loc].head=insert_PList(S->pOps[loc].head,tk,Cstep);
-            return SUCCESS;
-        }
-    return FAILURE;
-}
 /** Deletes references to predecessor node 'toDel' from successor list **/
 Graph* delete_Succ(Graph *graph,int fromDel,int toDel)
 {
@@ -320,7 +251,7 @@ else if(i==1)
          if(graph->stat[v]!=0)
          {
         AdjListNode* pCrawl = graph->su[v].head;
-        printf("\n Adjacency list of vertex %d: head ", v+1);
+        printf("\n Successor list of vertex %d: head ", v+1);
         while (pCrawl)
         {
             printf("-> %d", pCrawl->dest+1);
@@ -348,7 +279,12 @@ else if(i==1)
         //printf("\n");
     }
     }
-    cout<< "\n-------------Graph Printing---------------\n\n";
+    cout<<"\n ________________________\n";
+    for (v = 0; v < graph->V; ++v)
+    {
+        cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
+    }
+    cout<< "\n\n-------------Graph Printing---------------\n\n";
 }
 void createdot(struct Graph* graph,int V)
 {
@@ -382,7 +318,7 @@ void createSchDot(Schedule *sch,int param)
 {
     FILE *fp;
     char ch;
-    fp=fopen("schedule.txt","w");
+    fp=fopen("DynapmicLS_Schedule.txt","w");
     fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step \n");
 
     //fprintf(fp, "digraph "" {\n");
@@ -517,7 +453,7 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
     insert_ready_ops(graph,plMain,sch);
 
     int CStep=-1;
-    while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
+    /*while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
         #ifdef DEBUG
         plMain->toString();
@@ -557,11 +493,12 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
         sch->toString();
         #endif // DEBUG_
     }
-
+    */
     sch->n_cSteps=CStep+1;
     //sch->toString();
     return SUCCESS;
 }
+
 // Adjustments to vertex number and cSteps
 int cleanUp(Schedule *s)
 {
@@ -580,28 +517,31 @@ int cleanUp(Schedule *s)
                 }
             }
 }
-int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *ops)
+int ListSchedulingUtil(Graph *graph,char *hw_constraints)
 {
     //Creates PListMain based on Hardware Constraints
     PListMain *plM=new PListMain(hw_constraints);
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
     //Integrates ops & mobility into graph
-    alloc_op_mbty(graph,ops,graph->mob);
+    //alloc_op_mbty(graph,ops,graph->mob);
+
     // Creates Schedule based on Hardware constraints
     Schedule *currS=new Schedule(1,hw_constraints);
-    //Prints Graph and its Relevant Info
-    printGraph(graph,LIST_PRINT);
 
+    //Prints Graph and its Relevant Info
+
+    currS->toString();
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
     // Converts 0 indexed schedule to 1 indexed schedule
-    cleanUp(currS);
+    printGraph(graph,SCHEDULE_OPS_PRINT);
+    //cleanUp(currS);
     // Prints the Schedule
-    currS->toString();
+    //currS->toString();
 
     // Output to Text File
-    createSchDot(currS,0);
+    //createSchDot(currS,0);
 return SUCCESS;
 }
 int HAL_Bench()
@@ -625,16 +565,23 @@ int HAL_Bench()
     addEdge(graph, 3, 8);
     addEdge(graph, 9, 10);
 
-    ListSchedulingUtil(graph,hw_constraints,ops);
+    ListSchedulingUtil(graph,hw_constraints);
     return 0;
 }
-int main(int argv)
+int main()
 {
     cout<<"\n";
-    if(argv==1)
-        HAL_Bench();
+    //if(argv==1)
+    //    HAL_Bench();
     //#endif // HAL_L
+    cout<<" Main Method ";
 
     cout<<"\n";
+    Graph* graph = createGraph(MAX_LT);
+    readFromDot(graph);
+    /// Print Graph
+    printGraph(graph,1);
+    char hw_constraints[]="**-+<";
+    ListSchedulingUtil(graph,hw_constraints);
 return 0;
 }

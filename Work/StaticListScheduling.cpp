@@ -2,7 +2,7 @@
 TODO:                                       STATUS
 
 
-
+Note : internally all vertex are 0 indexed, along with their control steps, however when displayed ,they are 1 indexed
 ***/
 
 #include<iostream>
@@ -12,8 +12,8 @@ TODO:                                       STATUS
 #include<stdlib.h>
 #include<algorithm>
 #include<stack>
-
-#define DEBUG_
+#include<fstream>
+#undef DEBUG_
 
 #define MAX_LT 100
 
@@ -59,24 +59,7 @@ typedef struct sTable
         cout<< "\n-------------Table Printing----------------\n";
     }
 };
-void addEdge(Graph* graph, int src, int dest)
-{
-    // Add an edge from src to dest.  A new node is added to the adjacency
-    // list of src.  The node is added at the begining
-    AdjListNode* newNode = newAdjListNode(dest);
-    newNode->next = graph->su[src].head;
-    graph->su[src].head = newNode;
 
-    // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre[dest].head;
-    graph->pre[dest].head = newNode;
-
-    // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre_non_d[dest].head;
-    graph->pre_non_d[dest].head = newNode;
-}
 
 /*** Allocates mobility to vertices after computation ***/
 int alloc_op_mbty(Graph* graph,char *op,int *arr)
@@ -111,7 +94,7 @@ else if(i==1)
          if(graph->stat[v]!=0)
          {
         AdjListNode* pCrawl = graph->su[v].head;
-        printf("\n Adjacency list of vertex %d: head ", v+1);
+        printf("\n Successor List of vertex %d: head ", v+1);
         while (pCrawl)
         {
             printf("-> %d", pCrawl->dest+1);
@@ -139,10 +122,15 @@ else if(i==1)
         //printf("\n");
     }
     }
+    cout<<"\n ________________________\n";
+    for (v = 0; v < graph->V; ++v)
+    {
+        cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
+    }
     cout<< "\n-------------Graph Printing---------------\n\n";
 }
 
-//ASAP ALAP Calculation
+//ASAP ,ALAP Mobility Calculation - ADITYA's work
 int asap_alap(Graph *graph)
 {
 int t;
@@ -280,7 +268,7 @@ int cleanUp(Schedule *s)
         }
     }
 }
-// Merge Sort Optimized for strucutre
+// Merge Sort Optimized for sTable strucutre
 void merge(sTable *table, int l, int m, int r,int TYPE)
 {
     int i, j, k;
@@ -317,6 +305,7 @@ void merge(sTable *table, int l, int m, int r,int TYPE)
     k = l;
     while (i < n1 && j < n2)
     {
+        // PRIMARY - Ascending , other = Descending
         if(TYPE==PRIMARY)
         {
             if (LL->alap[i] <= RR->alap[j])
@@ -397,6 +386,8 @@ void mergeSort(sTable *table, int l, int r,int TYPE)
         merge(table, l, m, r,TYPE);
     }
 }
+
+// Transfers the relvant information from DFG -> Static Table for further work like sorting and scheduling
 int createTable(Graph *graph,sTable *table)
 {
    // table->toString();
@@ -435,52 +426,92 @@ int createTable(Graph *graph,sTable *table)
 return 0;
 
 }
-int checkPred(Graph *graph,int v,Schedule *s)
+// Schedule Printing
+void createSchDot(Schedule *sch,int param)
 {
-    //return true for empty predecessors
-     /*AdjListNode* p = graph->pre_non_d[v].head;
-     if(p==NULL)
-     {
-        return SUCCESS;
-     }
-     while(p)
+    FILE *fp;
+    char ch;
+    fp=fopen("StaticLS_Schedule.txt","w");
+    fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step \n");
+
+    //fprintf(fp, "digraph "" {\n");
+    for (int v = 0; v < sch->n_ops; ++v)
+    {
+        fprintf(fp,"%c : \t ",sch->op_arrange[v]);
+        PList* pCrawl = sch->pOps[v].head;
+        while (pCrawl)
         {
-            if(sHasV(s,p->dest)==FAILURE)
-                {
-                return FAILURE;
-                }
-        p=p->next;
+            fprintf(fp, "%d ( %d ) %d -> ",pCrawl->vertex_no+1,pCrawl->mobility,pCrawl->cStep+1);
+            pCrawl = pCrawl->next;
         }
-        */
-    return SUCCESS;
+        fprintf(fp,"\n");
+    }
+    fprintf(fp, "");
+    fclose(fp);
+}
+// Sort the table in descending order of priority
+int reverseTable(sTable *table)
+{
+
 }
 ///
 /// CORE SCHEDULING
 ///
 int staticListScheduling(sTable *table,Schedule *sch)
 {
-    int vSch=0,cStep=-1;
-    vector < vector<int> > hasSch(1,vector<int>(sch->n_ops,0));
-    /*while(vSch!=table->N)
+    int vSch=0,cStep=0,cur_op_sch=0,i=1;
+    //cout<< sch->n_ops;
+    int op_Sch[sch->n_ops];
+    //cout<<'\n';
+    // Reset them to 0
+    for(int j=0;j<sch->n_ops;j++)
+        { op_Sch[j]=0;}
+    for(int i=table->N-1;i>=0;i--)// Each Vertex
     {
-        cStep+=1;
-        //hasSch.push_back(vector<int> )
-        for(int i=0;i<sch->n_ops;i++) // Schedule iterator
-        {
-            for(int j=table->N-1;j>=0;j--) // Static Table iterator
+        //cout<<table->vertex_no[i]+1<<":"<<table->operation[i]<<'\t';
+       //char c_op ='*';
+       char c_op = table->operation[i];
+      // now for each hardware logic
+       for(int j=0;j<sch->n_ops;j++)
+       {
+          // cout<<sch->op_arrange[j]<<"\t";
+            if(c_op == sch->op_arrange[j] && op_Sch[j]==0) //HW found and no op is scheduled, then schedule it
             {
-                if(hasSch[cStep][i]==0 && table->operation[j]==sch->op_arrange[i])
-                {
-                    table->
-                    hasSch[cStep][i]=1;
-                    vSch+=1;
-                }
+                // Set isOpSch
+                op_Sch[j]=1;
+                //Add this vertex in the schedule
+                    PList *tr=new PList(c_op);
+                        tr->mobility=(abs)(table->alap[i]-table->asap[i]);
+                        tr->vertex_no=table->vertex_no[i];
+                        tr->cStep=cStep;
+                        if(schedule_op(sch,tr,cStep,j)==1)
+                        {
+                            cout<<"\n Scheduling Vertex "<<(tr->vertex_no)+1<<" on cStep "<<cStep+1<<" of "<<c_op<<" operator.";
+                            cur_op_sch=1;
+                            break;// Breaks searching for rest of h/w logic
+                        }
+                       // else cur_op_sch=0;
+               // cout<<"\n Scheduled vertex "<<tr->vertex_no<<" at "<<cStep;
             }
+
+       }
+       cout<<endl;
+       if(cur_op_sch==0) //Curr op could not find any free hardware logic
+       {
+            //increment cstep , and reset cur_op_sch & vector array
+            cStep+=1;
+            for(int j=0;j<sch->n_ops;j++)
+            { op_Sch[j]=0;}
+
+            i++;
         }
-    }*/
+        cur_op_sch=0;
+    }
+    cout<<'\n';
+
 return 0;
 }
-int staticListSchedulingUtil(Graph *graph,char *hw_constraints,char *ops)
+int staticListSchedulingUtil(Graph *graph,char *hw_constraints)
 {
     // Static Table initialization
     sTable *table=new sTable(graph->V);
@@ -491,7 +522,7 @@ int staticListSchedulingUtil(Graph *graph,char *hw_constraints,char *ops)
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
     //Integrates ops & mobility into graph
-    alloc_op_mbty(graph,ops,graph->mob);
+    //alloc_op_mbty(graph,ops,graph->mob);
     // Creates Schedule based on Hardware constraints
     Schedule *currS=new Schedule(1,hw_constraints);
     //Prints Graph and its Relevant Info
@@ -500,12 +531,21 @@ int staticListSchedulingUtil(Graph *graph,char *hw_constraints,char *ops)
     // Create Static Table for Scheduling
     createTable(graph,table);
 
+    // Reverse the static table for better conveinience
+    //reverseTable(table);
     // Schedules based on hardware availablity
     staticListScheduling(table,currS);
     // Converts 0 indexed schedule to 1 indexed schedule
-    cleanUp(currS);
+
     // Prints the Schedule
+    createSchDot(currS,0);
+
+    cleanUp(currS);
+
     currS->toString();
+
+    // Writes schedule to file
+
 return SUCCESS;
 }
 int main()
@@ -520,8 +560,8 @@ int main()
     //int mob[]={0,0,1,2,0,1,0,0,2,2,2};
     char ops[]="******--++<";
     char hw_constraints[]="**-+<";
-    Graph* graph = createGraph(V);
-    addEdge(graph, 0, 4);
+    Graph* graph = createGraph(MAX_LT);
+    /*addEdge(graph, 0, 4);
     addEdge(graph, 1, 4);
     addEdge(graph, 4, 6);
     addEdge(graph, 6, 7);
@@ -529,8 +569,9 @@ int main()
     addEdge(graph, 2, 5);
     addEdge(graph, 3, 8);
     addEdge(graph, 9, 10);
-
-    staticListSchedulingUtil(graph,hw_constraints,ops);
+    */
+    readFromDot(graph);
+    staticListSchedulingUtil(graph,hw_constraints);
 
     cout<<"\n";
 return 0;
