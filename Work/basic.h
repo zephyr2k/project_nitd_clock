@@ -35,11 +35,15 @@ op_arrange  <string>    Arrangement of H/W logic
 
 ***/
 #include<iostream>
+#include<stdio.h>
 #include<malloc.h>
 #include<vector>
 #include<string>
 #include<stdlib.h>
 #include<stack>
+#include<cstring>
+#include<stdlib.h>
+#include<fstream>
 
 enum{OP_PRINT,LIST_PRINT,SCHEDULE_OPS_PRINT};
 enum{PRIMARY,SECONDARY};
@@ -222,7 +226,7 @@ typedef struct Graph
     int stat[MAX_LT];       // ??? Forgot -- Status of what
     int toString()
     {
-        cout<<"\n\n----------------- Graph Printing -----------------\n\n";
+        cout<<"\n\n----------------- Graph Printing Start -----------------\n\n";
         //cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
         //cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"\n\t    ";
         cout<<"\n";
@@ -231,9 +235,23 @@ typedef struct Graph
             AdjListNode *temp=su[i].head;
             //cout<<"Predecessor List"
         }
+	cout<<"\n\n----------------- Graph Printing End -----------------\n\n";
         return 1;
     }
 };
+/*** Allocates mobility to vertices after computation ***/
+int alloc_op_mbty(Graph* graph,char *op)
+{
+
+    for(int v=0;v<graph->V;++v)
+    {
+
+        //graph->mob[v]=arr[v];
+        graph->operation[v]=op[v];
+
+    }
+    return 1;
+}
 // A utility function to create a new adjacency list node
 AdjListNode* newAdjListNode(int dest)
 {
@@ -346,22 +364,22 @@ void addEdge(Graph* graph, int src, int dest)
     newNode->next = graph->pre_non_d[dest].head;
     graph->pre_non_d[dest].head = newNode;
 }
-Graph *readFromDot(Graph *arr)
+int readFromDot(Graph *graph)
 {
     int global_count=0;
-ifstream file;	//File Handler
-	file.open("../benchmark/hal.dot",ios::in);	//Accessing the input file. It is in the .dot format. *Needs to be changed according to the input path of the file*
+    ifstream file;	//File Handler
+	file.open("../benchmark/hal.dot", ios::in);	//Accessing the input file. It is in the .dot format. *Needs to be changed according to the input path of the file*
 	char num1[10];
 	char num2[10];
-if(file.is_open())
+    if(file.is_open())
 	{
 		string line;
 		getline(file, line);
 		getline(file, line);
-		//cout<<"hello"<<endl;
 		while(!file.eof())
 		{
 			getline(file, line);
+
 			for(LL i=0; i<line.length(); i++)
 			{
 				if(line[i] == '=' && line[i+1] == ' ')	//Condition for checking and accessing the lines containing the node information of the graphs.
@@ -382,41 +400,46 @@ if(file.is_open())
 					}
 					//arr-> = atoi(num);	//Storing the node number in the node structure.
 					int v_no=atoi(num)-1;	//Adding the node pointer to an array, for access later while defining links.
+					//cout<<"\n:::: Vertex Number : "<<v_no<<" ::::";
 					string str="";
-
-					//str[0]=line[i+2];
-					//str[1]=line[i+3];
-					//str[2]=line[i+4];
 					str=(line[i+2]);
 					str+=(line[i+3]);
 					str+=(line[i+4]);
-					//cout<<str<<endl;
-					//strcat(str,line[i+2]);0
-					//vertex->node_name[1] = line[i+3];
-					//vertex->node_name[2] = line[i+4];
-                    //cout<<str;
-                    //string cmp[]={"mul","sub","add","les","gre","div"};
-                    //string s = "mul";
 					if(str.compare("mul")==0)
 					{
-                        //cout<<"\nBastard coming here : ";
-                        arr->operation[v_no]='*';
+                        graph->operation[v_no]='*';
+                        //cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
                     }
                     else if(str.compare("sub")==0)
-                        arr->operation[v_no]='-';
+                    {
+                        graph->operation[v_no]='-';
+                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
+                    }
                     else if(str.compare("add")==0)
-                        arr->operation[v_no]='+';
+                    {
+                        graph->operation[v_no]='+';
+                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
+                    }
                     else if(str.compare("les")==0)
-                        arr->operation[v_no]='<';
+                    {
+                        graph->operation[v_no]='<';
+                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
+                    }
                     else if(str.compare("gre")==0)
-                        arr->operation[v_no]='>';
+                    {
+                        graph->operation[v_no]='>';
+                      //  cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
+                    }
                     else if(str.compare("div")==0)
-                        arr->operation[v_no]='/';
+                    {
+                        graph->operation[v_no]='/';
+                      //  cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
+                    }
 
 					global_count++;
 
 				}
-				if(line[i] == '-' && line[i+1] == '>')	//Condition for accessing the lines where links are defined.
+				else if(line[i] == '-' && line[i+1] == '>')	//Condition for accessing the lines where links are defined.
 				{
 					int k=0,l=0;
 					for(LL j = 0; j<line.length(); j++)
@@ -434,7 +457,7 @@ if(file.is_open())
 					}
 
 					int x=0;
-					for(int y = l; y<line.length(); y++)
+					for(LL y = l; y<line.length(); y++)
 					{
 						if(int(line[y])>=48 && int(line[y])<=57)
 						{
@@ -444,34 +467,67 @@ if(file.is_open())
 								break;
 						}
 					}
-					cout<<"\nAdding edge between "<<atoi(num1)-1<<" and "<<atoi(num2)-1<<"\n";
-                    addEdge(arr,atoi(num1)-1,atoi(num2)-1);
-					/*
-					node *vertex1, *vertex2;	//Declaring two node pointers to map one node to another.
-					for(LL j = 0; j < global_count; j++)
-					{
-						if(arr[j]->node_number == atoi(num1))
-							vertex1 = arr[j];
-						if(arr[j]->node_number == atoi(num2))
-							vertex2 = arr[j];
-					}
-
-					LL i,j;
-					for(i=0; i < K && vertex1->next[i]!=0; i++);
-					for(j=0; j < K && vertex2->pred[j]!=0; j++);
-					vertex1->next[i] = vertex2;	//Defining the next relationship from one node to the other.
-					vertex2->pred[j] = vertex1;	//Defining the previous relationship in the reverse order.
-					for(int j=0; j<10; j++)
-						num1[j]=num2[j]='\0';
-                    */
+					cout<<"\nAdding edge between "<<(atoi(num1)-1)<<" and "<<(atoi(num2)-1)<<"\n";
+                    addEdge(graph,(atoi(num1)-1),(atoi(num2)-1));
 				}
 			}
-		}
-	}
-	arr->V=global_count;
-	cout<<"\n No of Vertex :"<<global_count;
-	file.close();	//Closing the openend file.
 
-	return arr;
+		}  // While Loop for file reading
+	}
+	file.close();
+	graph->V=global_count;
+	cout<<"\n No of Vertex : "<<global_count<<endl;
+		//Closing the openend file.
+	/*
+	/// Dot File Config
+    char ops[]="***--***++<";
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 4);
+    addEdge(graph, 5, 6);
+    addEdge(graph, 6, 4);
+    addEdge(graph, 7, 8);
+    addEdge(graph, 9, 10);
+    graph->V=11;
+    alloc_op_mbty(graph,ops);
+    */
+	return 1;
 }
+/** Checks if Schedule has vertex v **/
+int sHasV(Schedule *s,int v)
+{
+    //s->toString();
+    for(int i=0;i<s->n_ops;i++)
+    {
+    PList *pC=s->pOps[i].head;
+    while(pC)
+    {
+        if(v==pC->vertex_no)
+            return SUCCESS;
+        pC=pC->next;
+    }
+    }
+    return FAILURE;
+}
+/*** Should Check if Predecessors are scheduled ***/
+int checkPred(Graph *graph,int v,Schedule *s)
+{
+    //return true for empty predecessors
+     AdjListNode* p = graph->pre_non_d[v].head;
+     if(p==NULL)
+     {
+        return SUCCESS;
+     }
+     while(p)
+        {
+            if(sHasV(s,p->dest)==FAILURE)
+                {
+                return FAILURE;
+                }
+        p=p->next;
+        }
+    return SUCCESS;
+}
+
 
