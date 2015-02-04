@@ -18,14 +18,6 @@ BUGS
 
 ***/
 
-#include<iostream>
-#include<malloc.h>
-
-#include<cstring>
-#include<stdlib.h>
-#include<stack>
-#include<fstream>
-#include<cstring>
 #define DEBUG
 #define HAL
 
@@ -34,24 +26,6 @@ BUGS
 #include "basic.h"
 using namespace std;
 
-/// PList Node Structure for Scheduling
-///
-
-
-
-/*** Allocates mobility to vertices after computation ***/
-int alloc_op_mbty(Graph* graph,char *op,int *arr)
-{
-
-    for(int v=0;v<graph->V;++v)
-    {
-
-        graph->mob[v]=arr[v];
-        graph->operation[v]=op[v];
-
-    }
-    return 1;
-}
 
 /** Deletes references to predecessor node 'toDel' from successor list **/
 Graph* delete_Succ(Graph *graph,int fromDel,int toDel)
@@ -94,49 +68,20 @@ Graph* delete_Succ(Graph *graph,int fromDel,int toDel)
     }
 return graph;
 }
-/** Checks if Schedule has vertex v **/
-int sHasV(Schedule *s,int v)
-{
-    //s->toString();
-    for(int i=0;i<s->n_ops;i++)
-    {
-    PList *pC=s->pOps[i].head;
-    while(pC)
-    {
-        if(v==pC->vertex_no)
-            return SUCCESS;
-        pC=pC->next;
-    }
-    }
-    return FAILURE;
-}
-/*** Should Check if Predecessors are scheduled ***/
-int checkPred(Graph *graph,int v,Schedule *s)
-{
-    //return true for empty predecessors
-     AdjListNode* p = graph->pre_non_d[v].head;
-     if(p==NULL)
-     {
-        return SUCCESS;
-     }
-     while(p)
-        {
-            if(sHasV(s,p->dest)==FAILURE)
-                {
-                return FAILURE;
-                }
-        p=p->next;
-        }
-    return SUCCESS;
-}
+
+
 /** Takes PListMain inserts all ready operation in Schedule **/
-int insert_ready_ops(Graph *graph,PListMain *plMain,Schedule *s)
+int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
 {
     /***
     Scans all nodes, check for predecessors are scheduled or not,
     If scheduled deletes V ,and appends to Plist based on operation type
     ***/
+    cout<<"IRO";
     vector<int> visited(graph->V,0);
+    //int visited[graph->V];
+
+    //for(int v=0;v<graph->V;v++){visited[v]=0;}
 
     for(int v=0;v<graph->V;v++)
     {
@@ -227,21 +172,20 @@ int insert_ready_ops(Graph *graph,PListMain *plMain,Schedule *s)
         }
 
     }
-
-
     return SUCCESS;
 }
 // A utility function to print the adjacency list representation of graph
 void printGraph(Graph* graph,int i=0)
 {
     int v;
-    cout<< "\n\n-------------Graph Printing----------------\n";
+    cout<< "\n\n-------------Graph Printing Start----------------\n";
 if(i==0)
     {
+    cout<<" Vertex No : Mobility Operation\n";
     for (v = 0; v < graph->V; ++v)
     {
         if(graph->stat[v]!=0)
-        cout<<v<<": "<< graph->mob[v] <<" "<<graph->operation[v]<<"\n";
+        cout<<v<<" : "<< graph->mob[v] <<" "<<graph->operation[v]<<"\n";
     }
     }
 else if(i==1)
@@ -282,9 +226,9 @@ else if(i==1)
     cout<<"\n ________________________\n";
     for (v = 0; v < graph->V; ++v)
     {
-        cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
+        cout<<"\n"<<v<<" assigned operation : "<<graph->operation[v];
     }
-    cout<< "\n\n-------------Graph Printing---------------\n\n";
+    cout<< "\n\n-------------Graph Printing End---------------\n\n";
 }
 void createdot(struct Graph* graph,int V)
 {
@@ -433,6 +377,9 @@ for(int i=0;i<graph->V;i++)
     al[i]=al[i]-m+1;
    // printf("----alap-----%d %d\n",i+1,al[i]);
 }
+#ifdef DEBUG
+    cout<<"\nInside ASAL ALAP : Vertex Number (Mobility)\n";
+#endif // DEBUG
 for(int i=0;i<graph->V;i++)
 {
     graph->mob[i]=abs(al[i]-as[i]);
@@ -449,11 +396,11 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
 {
     /// m -- No of PList operators
     /// k -- ??
-
-    insert_ready_ops(graph,plMain,sch);
-
+        cout<<"\n Came Here 1.";
+    insert_ready_ops(graph,sch,plMain);
+        cout<<"\n Came Here 2.";
     int CStep=-1;
-    /*while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
+    while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
         #ifdef DEBUG
         plMain->toString();
@@ -488,12 +435,12 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
             }
         }
 
-        insert_ready_ops(graph,plMain,sch);
+        insert_ready_ops(graph,sch,plMain);
         #ifdef DEBUG
         sch->toString();
         #endif // DEBUG_
     }
-    */
+
     sch->n_cSteps=CStep+1;
     //sch->toString();
     return SUCCESS;
@@ -521,8 +468,10 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
 {
     //Creates PListMain based on Hardware Constraints
     PListMain *plM=new PListMain(hw_constraints);
+
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
+
     //Integrates ops & mobility into graph
     //alloc_op_mbty(graph,ops,graph->mob);
 
@@ -530,18 +479,20 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
     Schedule *currS=new Schedule(1,hw_constraints);
 
     //Prints Graph and its Relevant Info
+    // printGraph(graph);
 
-    currS->toString();
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
+
     // Converts 0 indexed schedule to 1 indexed schedule
-    printGraph(graph,SCHEDULE_OPS_PRINT);
-    //cleanUp(currS);
+    cleanUp(currS);
+
     // Prints the Schedule
-    //currS->toString();
+    currS->toString();
 
     // Output to Text File
     //createSchDot(currS,0);
+
 return SUCCESS;
 }
 int HAL_Bench()
@@ -555,33 +506,58 @@ int HAL_Bench()
     //int mob[]={0,0,1,2,0,1,0,0,2,2,2};
     char ops[]="******--++<";
     char hw_constraints[]="**-+<";
-    Graph* graph = createGraph(V);
-    addEdge(graph, 0, 4);
-    addEdge(graph, 1, 4);
-    addEdge(graph, 4, 6);
-    addEdge(graph, 6, 7);
-    addEdge(graph, 5, 7);
+    Graph* graph = createGraph(MAX_LT);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 4);
+    addEdge(graph, 5, 6);
     addEdge(graph, 2, 5);
-    addEdge(graph, 3, 8);
+    addEdge(graph, 7, 8);
     addEdge(graph, 9, 10);
-
+    graph->V=11;
+    alloc_op_mbty(graph,ops);
     ListSchedulingUtil(graph,hw_constraints);
     return 0;
 }
+
 int main()
 {
-    cout<<"\n";
-    //if(argv==1)
-    //    HAL_Bench();
-    //#endif // HAL_L
-    cout<<" Main Method ";
-
-    cout<<"\n";
+    cout<<"\n Main Method \n";
     Graph* graph = createGraph(MAX_LT);
-    readFromDot(graph);
+
+    cout<<"\n Dot File Reading initiated:\n";
+    //readFromDot(graph);
+
+   /// Dot File Config
+    /*char ops[]="***--***++<";
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 4);
+    addEdge(graph, 5, 6);
+    addEdge(graph, 6, 4);
+    addEdge(graph, 7, 8);
+    addEdge(graph, 9, 10);
+    graph->V=11;
+    alloc_op_mbty(graph,ops);*/
+
+    char ops[]="*****++++";
+    addEdge(graph, 0, 5);
+    addEdge(graph, 1, 5);
+    addEdge(graph, 2, 6);
+    addEdge(graph, 3, 6);
+    addEdge(graph, 6, 7);
+    addEdge(graph, 7, 8);
+    addEdge(graph, 4, 7);
+    addEdge(graph, 5, 8);
+    graph->V=9;
+    alloc_op_mbty(graph,ops);
+    //char hw_constraints[]="***-+<";
+    char hw_constraints[]="*+";
     /// Print Graph
-    printGraph(graph,1);
-    char hw_constraints[]="**-+<";
+    //printGraph(graph,1);
+
     ListSchedulingUtil(graph,hw_constraints);
 return 0;
 }
