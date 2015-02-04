@@ -13,7 +13,7 @@ Note : internally all vertex are 0 indexed, along with their control steps, howe
 #include<algorithm>
 #include<stack>
 #include<fstream>
-#undef DEBUG_
+#undef DEBUG
 
 #define MAX_LT 100
 
@@ -33,7 +33,7 @@ typedef struct sTable
     int asap[MAX_LT];
     int alap[MAX_LT];
     char operation[MAX_LT];
-    int status[MAX_LT];
+    //int status[MAX_LT];
     sTable(int n)
     {
         N=n;
@@ -44,7 +44,7 @@ typedef struct sTable
             asap[i]=-1;
             alap[i]=-1;
             operation[i]='-';
-            status[i]=UN_SCH;
+            //status[i]=UN_SCH;
         }
     }
     int toString()
@@ -61,19 +61,6 @@ typedef struct sTable
 };
 
 
-/*** Allocates mobility to vertices after computation ***/
-int alloc_op_mbty(Graph* graph,char *op,int *arr)
-{
-
-    for(int v=0;v<graph->V;++v)
-    {
-
-        graph->mob[v]=arr[v];
-        graph->operation[v]=op[v];
-
-    }
-    return 1;
-}
 // A utility function to print the adjacency list representation of graph
 void printGraph(Graph* graph,int i=0)
 {
@@ -401,7 +388,9 @@ int createTable(Graph *graph,sTable *table)
         table->asap[i]=graph->asap[i];
         table->operation[i]=graph->operation[i];
    }
-   table->toString();
+   #ifdef DEBUG
+        table->toString();
+   #endif
    mergeSort(table,0,table->N-1,PRIMARY);
    vector <int> V;
    int prev=0;
@@ -421,8 +410,9 @@ int createTable(Graph *graph,sTable *table)
    {
         table->priority[i]=i+1;
    }
-   table->toString();
-
+   #ifdef DEBUG
+        table->toString();
+   #endif
 return 0;
 
 }
@@ -517,7 +507,7 @@ int staticListSchedulingUtil(Graph *graph,char *hw_constraints)
     sTable *table=new sTable(graph->V);
 
     //Creates PListMain based on Hardware Constraints
-    PListMain *plM=new PListMain(hw_constraints);
+    //PListMain *plM=new PListMain(hw_constraints);
 
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
@@ -558,7 +548,7 @@ int main()
     ***/
     int V=11;
     //int mob[]={0,0,1,2,0,1,0,0,2,2,2};
-    char ops[]="******--++<";
+    //char ops[]="******--++<";
     char hw_constraints[]="**-+<";
     Graph* graph = createGraph(MAX_LT);
     /*addEdge(graph, 0, 4);
@@ -571,6 +561,7 @@ int main()
     addEdge(graph, 9, 10);
     */
     readFromDot(graph);
+
     staticListSchedulingUtil(graph,hw_constraints);
 
     cout<<"\n";
