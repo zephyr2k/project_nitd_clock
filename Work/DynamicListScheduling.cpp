@@ -6,7 +6,7 @@ TODO:                                       STATUS
         schedule_op                         DONE
         delete                              DONE
         first                               DONE
-    Implement List Scheduling               WIP
+    Implement List Scheduling               DONE
     Implement Schedule Structure            DONE, (FEATURES MAY BE ADDED)
     Implement Plist                         DONE, (FEATURES MAY BE ADDED)
     Graph Linking                           Done
@@ -19,9 +19,7 @@ BUGS
 ***/
 
 #define DEBUG
-#define HAL
-
-#define MAX_LT 100
+#include<iostream>
 
 #include "basic.h"
 using namespace std;
@@ -248,6 +246,10 @@ void createdot(struct Graph* graph,int V)
     fprintf(fp, "}");
     fclose(fp);
 }
+/*
+TRUE - Remains Inside
+FALSI - BREAKS OUT
+*/
 int PListEmptyCheck(PListMain *p)
 {
     int m=p->M;
@@ -468,7 +470,9 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
 {
     //Creates PListMain based on Hardware Constraints
     PListMain *plM=new PListMain(hw_constraints);
-
+    cout<<"\n\t\t Inside List Scheduling Util \n";
+    plM->toString();
+    cout<<"\n\t\t After Printing  PLMain \n";
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
 
@@ -484,11 +488,13 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
-    // Converts 0 indexed schedule to 1 indexed schedule
-    cleanUp(currS);
 
     // Prints the Schedule
     currS->toString();
+
+    // Converts 0 indexed schedule to 1 indexed schedule
+    cleanUp(currS);
+
 
     // Output to Text File
     //createSchDot(currS,0);
@@ -527,7 +533,8 @@ int main()
     Graph* graph = createGraph(MAX_LT);
 
     cout<<"\n Dot File Reading initiated:\n";
-    //readFromDot(graph);
+    char *location="../benchmark/hal.dot";
+    readFromDot(graph,location);
 
    /// Dot File Config
     /*char ops[]="***--***++<";
@@ -540,9 +547,10 @@ int main()
     addEdge(graph, 7, 8);
     addEdge(graph, 9, 10);
     graph->V=11;
-    alloc_op_mbty(graph,ops);*/
-
-    char ops[]="*****++++";
+    alloc_op_mbty(graph,ops);
+    */
+    // IIR
+    /*char ops[]="*****++++";
     addEdge(graph, 0, 5);
     addEdge(graph, 1, 5);
     addEdge(graph, 2, 6);
@@ -553,10 +561,11 @@ int main()
     addEdge(graph, 5, 8);
     graph->V=9;
     alloc_op_mbty(graph,ops);
-    //char hw_constraints[]="***-+<";
-    char hw_constraints[]="*+";
+    */
+    char hw_constraints[]="**+-<";
+    //char hw_constraints[]="*+";
     /// Print Graph
-    //printGraph(graph,1);
+    printGraph(graph,1);
 
     ListSchedulingUtil(graph,hw_constraints);
 return 0;

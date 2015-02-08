@@ -75,10 +75,7 @@ typedef struct PList
     // Variations of print for better eligiblity
     int toString()
     {
-        cout<<vertex_no;
-        cout<<"<"<<mobility<<">";
-
-        //cout<<"      ";
+        cout<<vertex_no<<"<"<<mobility<<">";
         return 1;
     }
     //Depreceted
@@ -93,22 +90,28 @@ typedef struct PListHead
 };
 typedef struct PListMain
 {
-    int M; /// No of Operation ----NOT---- no of vertex
+    int M; /// No of Unique Operation ----NOT---- no of vertex
     char op_type[MAX_LT];
     PListHead *direct;
-    PListMain(string ops)
+    PListMain(char *ops)
     {
-        M=ops.length();
+        int c=0;
+        while(ops[c])
+            c++;
+        M=c;
         direct=(PListHead *) malloc(M * sizeof(PListHead));
         for(int i=0;i<M;i++)
         {
-             op_type[i]=ops[i];
+            //graph->su[i].head = NULL;
+            direct[i].head=NULL;
+            op_type[i]=ops[i];
+            //op_type=ops;
         }
     }
 
  int toString()
     {
-        cout<<"\n\n--------PLIST CONTENTS------------\n\n";
+        cout<<"\n\n--------PLIST CONTENTS START------------\n\n";
         for(int i=0;i<M;i++)
         {
             printf("%c ",op_type[i]);
@@ -117,12 +120,11 @@ typedef struct PListMain
             {
                 cout<<" "<<p->vertex_no+1<<"<"<<p->mobility<<"> ";
                 p=p->next;
-
             }
             cout<<"\n";
 
         }
-        cout<<"\n--------PLIST CONTENTS------------\n\n";
+        cout<<"\n--------PLIST CONTENTS END------------\n\n";
     }
 
 };
@@ -161,7 +163,7 @@ typedef struct Schedule
     }
     int toString()
     {
-        cout<<"\n\n-----------------SCHEDULE-----------------\n\n";
+        cout<<"\n\n-----------------SCHEDULE BEGIN-----------------\n\n";
         cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
         cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"\n\t    ";
         cout<<"\n";
@@ -194,7 +196,7 @@ typedef struct Schedule
                 }
                  cout<<"\n";
             }
-        cout<<"\n-----------------SCHEDULE-----------------\n\n";
+        cout<<"\n-----------------SCHEDULE END-----------------\n\n";
         return 1;
     }
 };
@@ -364,11 +366,11 @@ void addEdge(Graph* graph, int src, int dest)
     newNode->next = graph->pre_non_d[dest].head;
     graph->pre_non_d[dest].head = newNode;
 }
-int readFromDot(Graph *graph)
+int readFromDot(Graph *graph,char *location)
 {
     int global_count=0;
     ifstream file;	//File Handler
-	file.open("../benchmark/hal.dot", ios::in);	//Accessing the input file. It is in the .dot format. *Needs to be changed according to the input path of the file*
+	file.open(location, ios::in);	//Accessing the input file. It is in the .dot format. *Needs to be changed according to the input path of the file*
 	char num1[10];
 	char num2[10];
     if(file.is_open())
