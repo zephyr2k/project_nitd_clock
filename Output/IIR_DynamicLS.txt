@@ -1,0 +1,10 @@
+Schedule Format :
+Control Step :  Vertex Number (Type of Operation)
+**************************************
+IIR 2 	 Hardware Constraints : **+
+**************************************
+
+s1 :	1 (*), 2 (*), 6 (+), 
+s2 :	3 (*), 4 (*), 7 (+), 
+s3 :	5 (*), 8 (+), 
+s4 :	9 (+), 
