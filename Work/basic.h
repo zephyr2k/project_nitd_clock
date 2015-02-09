@@ -165,9 +165,9 @@ typedef struct Schedule
     {
         cout<<"\n\n-----------------SCHEDULE BEGIN-----------------\n\n";
         cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
-        cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"\n\t    ";
+        cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"    "<<""<<op_arrange<<"\n\t";
         cout<<"\n";
-
+        #ifndef SCH_2
             for(int j=0;j<n_ops;j++)
             {
                 cout<<op_arrange[j]<<"\t";
@@ -196,6 +196,32 @@ typedef struct Schedule
                 }
                  cout<<"\n";
             }
+        #else
+        vector< vector<int> > vtx(MAX_LT);
+        vector< char > op(MAX_LT,'E');
+         for(int j=0;j<n_ops;j++)
+            {
+                PList *temp=pOps[j].head;
+                while(temp!=NULL && temp->cStep>=0)
+                {
+                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
+                    vtx[temp->cStep].push_back(temp->vertex_no);
+                    op[temp->vertex_no]=temp->op;
+                    temp=temp->next;
+                }
+            }
+        for(int i=0;i<n_cSteps;i++)
+        {
+            cout<<"s"<<i+1<<" :\t";
+            for(int j=0;j<vtx[i].size();j++)
+            {
+                    cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
+            }
+            cout<<endl;
+
+        }
+        #endif // SCH_2
+
         cout<<"\n-----------------SCHEDULE END-----------------\n\n";
         return 1;
     }
@@ -263,8 +289,6 @@ AdjListNode* newAdjListNode(int dest)
     return newNode;
 }
 ///  Global Variable Declaration HERE
-///
-///
 ///
 
 // A utility function that creates a graph of V vertices
