@@ -428,17 +428,17 @@ int readFromDot(Graph *graph,char *location)
 					str=(line[i+2]);
 					str+=(line[i+3]);
 					str+=(line[i+4]);
-					if(str.compare("mul")==0)
+					if(str.compare("mul")==0||str.compare("MUL")==0)
                         graph->operation[v_no]='*';
-                    else if(str.compare("sub")==0)
+                    else if(str.compare("sub")==0||str.compare("SUB")==0)
                         graph->operation[v_no]='-';
-                    else if(str.compare("add")==0)
+                    else if(str.compare("add")==0||str.compare("ADD")==0)
                         graph->operation[v_no]='+';
-                    else if(str.compare("les")==0)
+                    else if(str.compare("les")==0||str.compare("LES")==0)
                         graph->operation[v_no]='<';
-                    else if(str.compare("gre")==0)
+                    else if(str.compare("gre")==0||str.compare("GRE")==0)
                         graph->operation[v_no]='>';
-                    else if(str.compare("div")==0)
+                    else if(str.compare("div")==0||str.compare("DIV")==0)
                         graph->operation[v_no]='/';
 
 					global_count++;
