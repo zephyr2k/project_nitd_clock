@@ -19,6 +19,7 @@ BUGS
 ***/
 
 #define DEBUG
+#define SCH_2
 #include<iostream>
 
 #include "basic.h"
@@ -30,29 +31,24 @@ Graph* delete_Succ(Graph *graph,int fromDel,int toDel)
 {
     AdjListNode *curr=graph->pre[fromDel].head;
     AdjListNode *prev=curr;
-    //printf("\nFrom %d delete %d\n",curr->dest,toDel);
     if(curr==NULL)
         {
         curr=NULL;
-       // cout<<"1.\n";
+
         }
     else if(curr->dest==toDel)
         {
         /// Not Working
         /// FIXED
         graph->pre[fromDel].head=graph->pre[fromDel].head->next;
-       // cout<<"2.\n";
-       //printf("Delete from %d to %d\n",fromDel,toDel);
         }
     else
     {
     prev=curr;
     curr=curr->next;
-    //cout<<"3.\t";
+
     while(curr!=NULL)
     {
-       // cout<<curr->dest<<"\n";
-
         if(curr->dest==toDel)
         {
             prev->next=curr->next;
@@ -75,12 +71,8 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
     Scans all nodes, check for predecessors are scheduled or not,
     If scheduled deletes V ,and appends to Plist based on operation type
     ***/
-    cout<<"IRO";
+
     vector<int> visited(graph->V,0);
-    //int visited[graph->V];
-
-    //for(int v=0;v<graph->V;v++){visited[v]=0;}
-
     for(int v=0;v<graph->V;v++)
     {
         //checks for NULL ref
@@ -260,26 +252,55 @@ int PListEmptyCheck(PListMain *p)
     }
     return FAILURE;
 }
-void createSchDot(Schedule *sch,int param)
+void createSchDot(Schedule *sch,string param)
 {
     FILE *fp;
     char ch;
-    fp=fopen("DynapmicLS_Schedule.txt","w");
-    fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step \n");
-
-    //fprintf(fp, "digraph "" {\n");
+    fp=fopen("DynamicLS_Schedule.txt","w");
+    #ifndef SCH_2
+    fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step ");
     for (int v = 0; v < sch->n_ops; ++v)
     {
         fprintf(fp,"%c : \t ",sch->op_arrange[v]);
         PList* pCrawl = sch->pOps[v].head;
         while (pCrawl)
         {
-            fprintf(fp, "%d ( %d ) %d -> ",pCrawl->vertex_no,pCrawl->mobility,pCrawl->cStep);
+            fprintf(fp, "%d ( %d ) %d -> ",pCrawl->vertex_no+1,pCrawl->mobility,pCrawl->cStep+1);
             pCrawl = pCrawl->next;
         }
         fprintf(fp,"\n");
     }
     fprintf(fp, "");
+    #else
+    /// Edit Start
+    fprintf(fp,"Schedule Format :\nControl Step :  Vertex Number (Type of Operation)\n");
+    vector< vector<int> > vtx(MAX_LT);
+    vector< char > op(MAX_LT,'E');
+         for(int j=0;j<sch->n_ops;j++)
+            {
+                PList *temp=sch->pOps[j].head;
+                while(temp!=NULL && temp->cStep>=0)
+                {
+                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
+                    vtx[temp->cStep].push_back(temp->vertex_no);
+                    op[temp->vertex_no]=temp->op;
+                    temp=temp->next;
+                }
+            }
+        for(int i=0;i<sch->n_cSteps;i++)
+        {
+            //cout<<"s"<<i+1<<" :\t";
+            fprintf(fp, "s%d :\t",i+1);
+            for(int j=0;j<vtx[i].size();j++)
+            {
+                   // cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
+                    fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
+            }
+            //cout<<endl;
+            fprintf(fp, "\n");
+        }
+    /// Edit End
+    #endif // SCH_2
     fclose(fp);
 }
 int asap_alap(Graph *graph)
@@ -398,9 +419,7 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
 {
     /// m -- No of PList operators
     /// k -- ??
-        cout<<"\n Came Here 1.";
     insert_ready_ops(graph,sch,plMain);
-        cout<<"\n Came Here 2.";
     int CStep=-1;
     while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
@@ -418,7 +437,7 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
                     temp=plMain->direct[k].head;
                     if(temp!=NULL && temp->op==sch->op_arrange[funit])
                     {
-                         #ifdef DEBUG
+                        #ifdef DEBUG
                         printf("To Schedule '%c' %d<%d> at step %d\n",temp->op,temp->vertex_no+1,temp->mobility,CStep+1);
                         #endif // DEBUG_
 
@@ -468,11 +487,12 @@ int cleanUp(Schedule *s)
 }
 int ListSchedulingUtil(Graph *graph,char *hw_constraints)
 {
+    // Print Graph
+    printGraph(graph,1);
+
     //Creates PListMain based on Hardware Constraints
     PListMain *plM=new PListMain(hw_constraints);
-    cout<<"\n\t\t Inside List Scheduling Util \n";
-    plM->toString();
-    cout<<"\n\t\t After Printing  PLMain \n";
+
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
 
@@ -482,49 +502,19 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
     // Creates Schedule based on Hardware constraints
     Schedule *currS=new Schedule(1,hw_constraints);
 
-    //Prints Graph and its Relevant Info
-    // printGraph(graph);
-
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
-
-    // Prints the Schedule
+    // Prints the final Schedule
     currS->toString();
 
     // Converts 0 indexed schedule to 1 indexed schedule
-    cleanUp(currS);
-
+    //cleanUp(currS);
 
     // Output to Text File
-    //createSchDot(currS,0);
+    createSchDot(currS,"");
 
 return SUCCESS;
-}
-int HAL_Bench()
-{
-    string op_arr="";
-    /*** Example from notes
-        V=11
-        E=11
-    ***/
-    int V=11;
-    //int mob[]={0,0,1,2,0,1,0,0,2,2,2};
-    char ops[]="******--++<";
-    char hw_constraints[]="**-+<";
-    Graph* graph = createGraph(MAX_LT);
-    addEdge(graph, 0, 2);
-    addEdge(graph, 1, 2);
-    addEdge(graph, 2, 3);
-    addEdge(graph, 3, 4);
-    addEdge(graph, 5, 6);
-    addEdge(graph, 2, 5);
-    addEdge(graph, 7, 8);
-    addEdge(graph, 9, 10);
-    graph->V=11;
-    alloc_op_mbty(graph,ops);
-    ListSchedulingUtil(graph,hw_constraints);
-    return 0;
 }
 
 int main()
@@ -535,6 +525,9 @@ int main()
     cout<<"\n Dot File Reading initiated:\n";
     char *location="../benchmark/hal.dot";
     readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**+-<";
 
    /// Dot File Config
     /*char ops[]="***--***++<";
@@ -562,11 +555,8 @@ int main()
     graph->V=9;
     alloc_op_mbty(graph,ops);
     */
-    char hw_constraints[]="**+-<";
-    //char hw_constraints[]="*+";
-    /// Print Graph
-    printGraph(graph,1);
 
     ListSchedulingUtil(graph,hw_constraints);
+
 return 0;
 }
