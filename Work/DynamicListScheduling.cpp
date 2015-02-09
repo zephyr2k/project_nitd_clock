@@ -212,7 +212,7 @@ else if(i==1)
     cout<<"\n ________________________\n";
     for (v = 0; v < graph->V; ++v)
     {
-        cout<<"\n"<<v<<" assigned operation : "<<graph->operation[v];
+        cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
     }
     cout<< "\n\n-------------Graph Printing End---------------\n\n";
 }
@@ -303,7 +303,7 @@ void createSchDot(Schedule *sch,char *param,char *fname)
     cout<<"\n Created Output for "<<param<<" with Hardware constraints ";
     for(int i=0;i<sch->n_ops;i++)
         printf("%c",sch->op_arrange[i]);
-    cout<<" having file name : "<<fname<<"\n";
+    cout<<" at Location : "<<fname<<"\n";
 }
 int asap_alap(Graph *graph)
 {
@@ -510,19 +510,16 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname)
 
 return SUCCESS;
 }
-
-int main()
+int HAL_Util()
 {
-    cout<<"\n Main Method Begin\n";
     Graph* graph = createGraph(MAX_LT);
-
-    cout<<"\n Dot File Reading initiated:\n";
     // Location of the dot File
-    char *location="../benchmark/iir2.dot";
+    char *location="../benchmark/hal.dot";
     // Name of Benchmark
-    char *type="IIR 2";
+    char *type="HAL";
     // Expected output for the resultant Schedule
-    char *fname="IIR2_DynamicLS.txt";
+    char *fname="../Output/HAL_DynamicLS.txt";
+
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
@@ -530,6 +527,69 @@ int main()
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname);
+}
+int IIR_Util()
+{
+    Graph* graph = createGraph(MAX_LT);
+    // Location of the dot File
+    char *location="../benchmark/iir2.dot";
+    // Name of Benchmark
+    char *type="IIR 2";
+    // Expected output for the resultant Schedule
+    char *fname="../Output/IIR_DynamicLS.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**+";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname);
+}
+int ARF1_Util()
+{
+    Graph* graph = createGraph(MAX_LT);
+    // Location of the dot File
+    char *location="../benchmark/arf1.dot";
+    // Name of Benchmark
+    char *type="ARF 1";
+    // Expected location of output file for the resultant Schedule
+    char *fname="../Output/ARF1_DynamicLS.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**++";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname);
+}
+int FIR_Util()
+{
+    Graph* graph = createGraph(MAX_LT);
+    // Location of the dot File
+    char *location="../benchmark/fir2.dot";
+    // Name of Benchmark
+    char *type="FIR 2";
+    // Expected output for the resultant Schedule
+    char *fname="../Output/FIR2_DynamicLS.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**+++";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname);
+}
+int main()
+{
+    cout<<"\n Main Method Begin\n";
+
+    HAL_Util();
+    IIR_Util();
+    ARF1_Util();
+    FIR_Util();
 
     cout<<"\n Main Method End\n";
 return 0;
