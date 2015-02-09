@@ -410,7 +410,6 @@ int readFromDot(Graph *graph,char *location)
 			{
 				if(line[i] == '=' && line[i+1] == ' ')	//Condition for checking and accessing the lines containing the node information of the graphs.
 				{
-					//AdjListNode *vertex = new AdjListNode();	//Dynamically defining a new node module. Vertex points to it
 					// Reading Vertex Number
 					char num[10];
 					int k=0;
@@ -424,43 +423,23 @@ int readFromDot(Graph *graph,char *location)
 								break;
 						}
 					}
-					//arr-> = atoi(num);	//Storing the node number in the node structure.
 					int v_no=atoi(num)-1;	//Adding the node pointer to an array, for access later while defining links.
-					//cout<<"\n:::: Vertex Number : "<<v_no<<" ::::";
 					string str="";
 					str=(line[i+2]);
 					str+=(line[i+3]);
 					str+=(line[i+4]);
 					if(str.compare("mul")==0)
-					{
                         graph->operation[v_no]='*';
-                        //cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
                     else if(str.compare("sub")==0)
-                    {
                         graph->operation[v_no]='-';
-                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
                     else if(str.compare("add")==0)
-                    {
                         graph->operation[v_no]='+';
-                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
                     else if(str.compare("les")==0)
-                    {
                         graph->operation[v_no]='<';
-                       // cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
                     else if(str.compare("gre")==0)
-                    {
                         graph->operation[v_no]='>';
-                      //  cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
                     else if(str.compare("div")==0)
-                    {
                         graph->operation[v_no]='/';
-                      //  cout<<"\n:::: Vertex Number : "<<v_no<<" :: OP: "<<graph->operation[v_no]<<" :";
-                    }
 
 					global_count++;
 

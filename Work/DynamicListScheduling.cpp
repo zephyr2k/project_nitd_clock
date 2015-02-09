@@ -7,14 +7,14 @@ TODO:                                       STATUS
         delete                              DONE
         first                               DONE
     Implement List Scheduling               DONE
-    Implement Schedule Structure            DONE, (FEATURES MAY BE ADDED)
-    Implement Plist                         DONE, (FEATURES MAY BE ADDED)
+    Implement Schedule Structure            DONE, V2(FEATURES MAY BE ADDED)
+    Implement PList                         DONE, (FEATURES MAY BE ADDED)
     Graph Linking                           Done
 
 ** Requires reading schedule from Graph with ASAP , ALAP & Mobility of each vertex already computed.
-    ---> Function added to compute mobility,asap,alap
+    ---> Function added to compute mobility,asap,alap.
 BUGS
-    1. Inadequate hw pushes other operation in that Control Step to below it - FIXED (It ignores the new schedule operation)
+    1. Inadequate hardware pushes other operation in that Control Step to below it - FIXED (It ignores the new schedule operation)
 
 ***/
 
@@ -22,6 +22,7 @@ BUGS
 #define SCH_2
 #include<iostream>
 
+/// Contains Structure definition of PList, Schedule ,etc along with some basic function
 #include "basic.h"
 using namespace std;
 
@@ -77,11 +78,10 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
     {
         //checks for NULL ref
         // check if adjNodes of v are schedules in 's' or not
-        //printf("\n Test Vertex %d(%d) \n",v+1,checkPred(graph,v,s));
+
         if(visited[v]!=1 && graph->stat[v]!=0 && checkPred(graph,v,s))
         {
-            //printf("Deleting %d.\n",v);
-            //printf("\n Test Vertex %d(%d) \n",v+1,checkPred(graph,v,s));
+
             PList *t=new PList(graph->operation[v]);
             t->vertex_no=v;
             t->mobility=graph->mob[v];
@@ -90,7 +90,7 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
             AdjListNode *p=graph->su[v].head;
             while(p!=NULL)
             {
-                //cout<<p->dest<<"\t"<<v<<"\n";
+
                 delete_Succ(graph,p->dest,v);
                 visited[p->dest]=1;
                 p=p->next;
@@ -115,8 +115,7 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
 
                     /// Insert in corresp. PLMain
                     /// ORDER SHOULD BE ASC MOBLITLITY, FOR SAME MOBILITY : LOWER VERTEX NUMBER
-                    //PList *tr;
-                    //printf("\nAdding to List %d<%d>\n",t->vertex_no+1,t->mobility);
+
                     if(plMain->direct[i].head==NULL)
                     {
                         plMain->direct[i].head=t;
@@ -126,7 +125,7 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
                     PList *pCrawl=plMain->direct[i].head;
                     if(t->mobility<=pCrawl->mobility)
                     {
-                        //Case: 1.Same moblity, 2. Mobilty Less for 't'
+
                         if(t->mobility<pCrawl->mobility||t->vertex_no<pCrawl->vertex_no)
                         {
                         t->next=pCrawl;
@@ -137,25 +136,22 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
                     while(pCrawl->next)
                     {
                         if((t->mobility<pCrawl->next->mobility))
-                            {
-
-                          //  cout<<"\n";
+                        {
                             c=1;
                             break;
-                            }
+                        }
                         pCrawl=pCrawl->next;
                     }
                     if(c==1)
                     {
-                      PList *tr=pCrawl->next;
-                      pCrawl->next=t;
-                       t->next=tr;
+                        PList *tr=pCrawl->next;
+                        pCrawl->next=t;
+                        t->next=tr;
                     }
                     else
                     {
                         pCrawl->next=t;
                     }
-
                 break;
                 }
             }
@@ -240,7 +236,7 @@ void createdot(struct Graph* graph,int V)
 }
 /*
 TRUE - Remains Inside
-FALSI - BREAKS OUT
+FALSE - BREAKS OUT
 */
 int PListEmptyCheck(PListMain *p)
 {
@@ -252,11 +248,11 @@ int PListEmptyCheck(PListMain *p)
     }
     return FAILURE;
 }
-void createSchDot(Schedule *sch,string param)
+void createSchDot(Schedule *sch,char *param,char *fname)
 {
     FILE *fp;
     char ch;
-    fp=fopen("DynamicLS_Schedule.txt","w");
+    fp=fopen(fname,"w");
     #ifndef SCH_2
     fprintf(fp,"// Schedule Format : Vertex Number < Mobility > Control Step ");
     for (int v = 0; v < sch->n_ops; ++v)
@@ -273,7 +269,12 @@ void createSchDot(Schedule *sch,string param)
     fprintf(fp, "");
     #else
     /// Edit Start
-    fprintf(fp,"Schedule Format :\nControl Step :  Vertex Number (Type of Operation)\n");
+    fprintf(fp,"Schedule Format :\nControl Step :  Vertex Number (Type of Operation)");
+    fprintf(fp,"\n**************************************\n");
+    fprintf(fp,"%s \t Hardware Constraints : ",param);
+    for(int i=0;i<sch->n_ops;i++)
+        fprintf(fp,"%c",sch->op_arrange[i]);
+    fprintf(fp,"\n**************************************\n\n");
     vector< vector<int> > vtx(MAX_LT);
     vector< char > op(MAX_LT,'E');
          for(int j=0;j<sch->n_ops;j++)
@@ -289,19 +290,20 @@ void createSchDot(Schedule *sch,string param)
             }
         for(int i=0;i<sch->n_cSteps;i++)
         {
-            //cout<<"s"<<i+1<<" :\t";
             fprintf(fp, "s%d :\t",i+1);
             for(int j=0;j<vtx[i].size();j++)
             {
-                   // cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
-                    fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
+                fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
             }
-            //cout<<endl;
             fprintf(fp, "\n");
         }
     /// Edit End
     #endif // SCH_2
     fclose(fp);
+    cout<<"\n Created Output for "<<param<<" with Hardware constraints ";
+    for(int i=0;i<sch->n_ops;i++)
+        printf("%c",sch->op_arrange[i]);
+    cout<<" having file name : "<<fname<<"\n";
 }
 int asap_alap(Graph *graph)
 {
@@ -310,7 +312,6 @@ vector<int> as(MAX_LT,0),al(MAX_LT,0);
 stack<int> f;
 int te[100];
 int s=0;
-   // int a,b,e,i,v;
 for (int v = 0; v < graph->V; ++v)
 {
     AdjListNode* pCrawl = graph->pre[v].head;
@@ -342,10 +343,6 @@ while(!f.empty())
     }
     if(f.empty())
         break;
-}
-for(int i=0;i<graph->V;i++)
-{
-   //printf("----asap-----%d %d\n",i+1,as[i]);
 }
 for (int v = 0; v < graph->V; ++v)
 {
@@ -398,7 +395,6 @@ for(int i=0;i<graph->V;i++)
 for(int i=0;i<graph->V;i++)
 {
     al[i]=al[i]-m+1;
-   // printf("----alap-----%d %d\n",i+1,al[i]);
 }
 #ifdef DEBUG
     cout<<"\nInside ASAL ALAP : Vertex Number (Mobility)\n";
@@ -449,10 +445,8 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
 
                             temp = plMain->direct[k].head->next;
                             plMain->direct[k].head=temp;
-
                     }
                 }
-
             }
         }
 
@@ -463,7 +457,6 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
     }
 
     sch->n_cSteps=CStep+1;
-    //sch->toString();
     return SUCCESS;
 }
 
@@ -472,7 +465,6 @@ int cleanUp(Schedule *s)
 {
    for(int j=0;j<s->n_ops;j++)
             {
-                //cout<<""<<op_arrange[j]<<"\t";
                 PList *temp=s->pOps[j].head;
                 while(temp!=NULL)
                 {
@@ -485,7 +477,8 @@ int cleanUp(Schedule *s)
                 }
             }
 }
-int ListSchedulingUtil(Graph *graph,char *hw_constraints)
+/// ListScheduling Utility that takes as input the DFG, Hardware Constraints, and the Namr of the Benchmarks (optional)
+int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname)
 {
     // Print Graph
     printGraph(graph,1);
@@ -512,51 +505,32 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints)
     //cleanUp(currS);
 
     // Output to Text File
-    createSchDot(currS,"");
+    createSchDot(currS,type,fname);
+
 
 return SUCCESS;
 }
 
 int main()
 {
-    cout<<"\n Main Method \n";
+    cout<<"\n Main Method Begin\n";
     Graph* graph = createGraph(MAX_LT);
 
     cout<<"\n Dot File Reading initiated:\n";
-    char *location="../benchmark/hal.dot";
+    // Location of the dot File
+    char *location="../benchmark/iir2.dot";
+    // Name of Benchmark
+    char *type="IIR 2";
+    // Expected output for the resultant Schedule
+    char *fname="IIR2_DynamicLS.txt";
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
     char hw_constraints[]="**+-<";
 
-   /// Dot File Config
-    /*char ops[]="***--***++<";
-    addEdge(graph, 0, 2);
-    addEdge(graph, 1, 2);
-    addEdge(graph, 2, 3);
-    addEdge(graph, 3, 4);
-    addEdge(graph, 5, 6);
-    addEdge(graph, 6, 4);
-    addEdge(graph, 7, 8);
-    addEdge(graph, 9, 10);
-    graph->V=11;
-    alloc_op_mbty(graph,ops);
-    */
-    // IIR
-    /*char ops[]="*****++++";
-    addEdge(graph, 0, 5);
-    addEdge(graph, 1, 5);
-    addEdge(graph, 2, 6);
-    addEdge(graph, 3, 6);
-    addEdge(graph, 6, 7);
-    addEdge(graph, 7, 8);
-    addEdge(graph, 4, 7);
-    addEdge(graph, 5, 8);
-    graph->V=9;
-    alloc_op_mbty(graph,ops);
-    */
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname);
 
-    ListSchedulingUtil(graph,hw_constraints);
-
+    cout<<"\n Main Method End\n";
 return 0;
 }
