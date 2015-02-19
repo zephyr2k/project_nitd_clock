@@ -49,6 +49,7 @@ enum{OP_PRINT,LIST_PRINT,SCHEDULE_OPS_PRINT};
 enum{PRIMARY,SECONDARY};
 enum{UN_SCH,SCH};
 enum{FAILURE,SUCCESS};
+
 typedef unsigned long long int LL;
 #define MAX_LT 100
 
@@ -212,11 +213,15 @@ typedef struct Schedule
             }
         for(int i=0;i<n_cSteps;i++)
         {
+
             cout<<"s"<<i+1<<" :\t";
             for(int j=0;j<vtx[i].size();j++)
             {
+
+
                     cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
             }
+
             cout<<endl;
 
         }
@@ -252,31 +257,67 @@ typedef struct Graph
     int mob[MAX_LT];        // Mobility of Vertices
     char operation[MAX_LT]; // Type of operation associated with the vertex
     int stat[MAX_LT];       // ??? Forgot -- Status of what
-    int toString()
-    {
-        cout<<"\n\n----------------- Graph Printing Start -----------------\n\n";
-        //cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
-        //cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"\n\t    ";
-        cout<<"\n";
-        for(int i=0;i<V;i++)
-        {
-            AdjListNode *temp=su[i].head;
-            //cout<<"Predecessor List"
-        }
-	cout<<"\n\n----------------- Graph Printing End -----------------\n\n";
-        return 1;
-    }
+
 };
+
+/// Reads Power from file if defined and stores it in cost vector
+int readPower(vector < pair<char,int> > cost)
+{
+    // Reads only if define
+    #ifdef READ_POWER
+    ifstream file;	//File Handler
+	file.open("cost.txt", ios::in);
+	char num1[10];
+
+    if(file.is_open())
+	{
+		string line;
+		//getline(file, line);
+		//getline(file, line);
+		while(!file.eof())
+		{
+		    getline(file, line);
+		    if(line[0]!='#')
+            {
+
+                int k=0,l=0;
+                // Read Value and store in num1
+					for(LL j = 0; j<line.length(); j++)
+					{
+						if(int(line[j])>=48 && int(line[j])<=57)
+						{
+							num1[k]=line[j];
+							k++;
+							if(line[j+1] == ' ')
+							{
+								l=j+1;
+								break;
+							}
+						}
+					}
+					cost.push_back(make_pair(line[0],atoi(num1)));
+            }
+		}
+	}
+	file.close();
+	#ifdef DEBUG
+	cout<<"\n-----Values of Each operator Read from file------\n";
+	for(int i=0;i<cost.size();i++)
+    {
+        cout<<"\n"<<cost[i].first<<"\t"<<cost[i].second;
+    }
+    cout<<"\n\n------------------------------------------------\n\n";
+    #endif // DEBUG
+    #endif // READ_POWER
+    return SUCCESS;
+}
 /*** Allocates mobility to vertices after computation ***/
 int alloc_op_mbty(Graph* graph,char *op)
 {
-
     for(int v=0;v<graph->V;++v)
     {
 
-        //graph->mob[v]=arr[v];
         graph->operation[v]=op[v];
-
     }
     return 1;
 }
@@ -428,19 +469,23 @@ int readFromDot(Graph *graph,char *location)
 					str=(line[i+2]);
 					str+=(line[i+3]);
 					str+=(line[i+4]);
-					if(str.compare("mul")==0||str.compare("MUL")==0)
+					if(str.compare("mul")==0||str.compare("MUL")==0||line[i+3]=='*')
                         graph->operation[v_no]='*';
-                    else if(str.compare("sub")==0||str.compare("SUB")==0)
+                    else if(str.compare("sub")==0||str.compare("SUB")==0||line[i+3]=='-')
                         graph->operation[v_no]='-';
-                    else if(str.compare("add")==0||str.compare("ADD")==0)
+                    else if(str.compare("add")==0||str.compare("ADD")==0||line[i+3]=='+')
                         graph->operation[v_no]='+';
-                    else if(str.compare("les")==0||str.compare("LES")==0)
+                    else if(str.compare("les")==0||str.compare("LES")==0||line[i+3]=='<')
                         graph->operation[v_no]='<';
-                    else if(str.compare("gre")==0||str.compare("GRE")==0)
+                    else if(str.compare("gre")==0||str.compare("GRE")==0||line[i+3]=='>')
                         graph->operation[v_no]='>';
-                    else if(str.compare("div")==0||str.compare("DIV")==0)
+                    else if(str.compare("div")==0||str.compare("DIV")==0||line[i+3]=='/')
                         graph->operation[v_no]='/';
-
+                    else if(str.compare("exp")==0||str.compare("EXP")==0||line[i+3]=='^')
+                        graph->operation[v_no]='^';
+                    else if(str.compare("imp")==0||str.compare("IMP")==0||line[i+3]=='!')
+                        graph->operation[v_no]='!';
+                    // Add custom operation here
 					global_count++;
 
 				}
@@ -482,21 +527,6 @@ int readFromDot(Graph *graph,char *location)
 	file.close();
 	graph->V=global_count;
 	cout<<"\n No of Vertex : "<<global_count<<endl;
-		//Closing the openend file.
-	/*
-	/// Dot File Config
-    char ops[]="***--***++<";
-    addEdge(graph, 0, 2);
-    addEdge(graph, 1, 2);
-    addEdge(graph, 2, 3);
-    addEdge(graph, 3, 4);
-    addEdge(graph, 5, 6);
-    addEdge(graph, 6, 4);
-    addEdge(graph, 7, 8);
-    addEdge(graph, 9, 10);
-    graph->V=11;
-    alloc_op_mbty(graph,ops);
-    */
 	return 1;
 }
 /** Checks if Schedule has vertex v **/

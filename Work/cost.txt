@@ -1,0 +1,13 @@
+#
+#	Lines beginning with # are ignored. Format :
+#		operator<space>cost(int format)
+#	Eg: 	+ 20
+#
+- 3
++ 7
+* 15
+/ 18
+< 12
+> 12
+! 1
+^ 25

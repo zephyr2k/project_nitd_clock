@@ -20,6 +20,7 @@ BUGS
 
 #define DEBUG
 #define SCH_2
+#define READ_POWER
 #include<iostream>
 
 /// Contains Structure definition of PList, Schedule ,etc along with some basic function
@@ -477,8 +478,99 @@ int cleanUp(Schedule *s)
                 }
             }
 }
+/// Displays Schedule taking Power into account
+int disp_Power(Schedule *sch,char *fname)
+{
+    vector < pair<char,int> > cost;
+        // Reads only if define
+
+    ifstream file;	//File Handler
+	file.open(fname, ios::in);
+	char num1[10];
+    if(file.is_open())
+	{
+		string line;
+		//getline(file, line);
+		//getline(file, line);
+		while(!file.eof())
+		{
+		    getline(file, line);
+		    if(line[0]!='#')
+            {
+
+                int k=0,l=0;
+                // Read Value and store in num1
+					for(LL j = 0; j<line.length(); j++)
+					{
+						if(int(line[j])>=48 && int(line[j])<=57)
+						{
+							num1[k]=line[j];
+							k++;
+							if(line[j+1] == ' ')
+							{
+								l=j+1;
+								break;
+							}
+						}
+					}
+					cost.push_back(make_pair(line[0],atoi(num1)));
+            }
+		}
+	}
+	file.close();
+	#ifdef DEBUG
+	cout<<"\n-----Values of Each operator Read from file------\n";
+	for(int i=0;i<cost.size();i++)
+    {
+        cout<<"\n"<<cost[i].first<<"\t"<<cost[i].second;
+    }
+    cout<<"\n\n------------------------------------------------\n\n";
+    #endif // DEBUG
+        vector< vector<int> > vtx(MAX_LT);
+        vector< char > op(MAX_LT,'E');
+         for(int j=0;j<sch->n_ops;j++)
+            {
+                PList *temp=sch->pOps[j].head;
+                while(temp!=NULL && temp->cStep>=0)
+                {
+                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
+                    vtx[temp->cStep].push_back(temp->vertex_no);
+                    op[temp->vertex_no]=temp->op;
+                    temp=temp->next;
+                }
+            }
+        cout<<"\n\n---------------- FINAL SCHEDULE BEGIN ----------------\n\n";
+        cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
+        cout<<"\ncSteps: "<<sch->n_cSteps<<"\t nOps: "<<sch->n_ops<<"    "<<""<<sch->op_arrange<<"\n\t";
+        cout<<"\n";
+        for(int i=0;i<sch->n_cSteps;i++)
+        {
+            int power=0;
+            cout<<"s"<<i+1<<" :\t";
+            for(int j=0;j<vtx[i].size();j++)
+            {
+
+                for(int k=0;k<cost.size();k++)
+                {
+
+                    if(cost[k].first==op[vtx[i][j]])
+                    {
+                       // cout<<"\n"<<cost[k].first<<"\n";
+                        power+=cost[k].second;
+                        break;
+                    }
+                }
+                    cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
+            }
+            cout<<"\t"<<power;
+            cout<<endl;
+
+        }
+        cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
+    return 1;
+}
 /// ListScheduling Utility that takes as input the DFG, Hardware Constraints, and the Namr of the Benchmarks (optional)
-int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname)
+int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,char* power_cfg)
 {
     // Print Graph
     printGraph(graph,1);
@@ -499,7 +591,12 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname)
     ListScheduling(graph,currS,plM);
 
     // Prints the final Schedule
-    currS->toString();
+    #ifndef READ_POWER
+        currS->toString();
+    #else
+        disp_Power(currS,power_cfg);
+    #endif
+
 
     // Converts 0 indexed schedule to 1 indexed schedule
     //cleanUp(currS);
@@ -520,13 +617,16 @@ int HAL_Util()
     // Expected output for the resultant Schedule
     char *fname="../Output/HAL_DynamicLS.txt";
 
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
     char hw_constraints[]="**+-<";
 
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
 }
 int IIR_Util()
 {
@@ -538,13 +638,16 @@ int IIR_Util()
     // Expected output for the resultant Schedule
     char *fname="../Output/IIR_DynamicLS.txt";
 
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
     char hw_constraints[]="**+";
 
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
 }
 int ARF1_Util()
 {
@@ -556,13 +659,16 @@ int ARF1_Util()
     // Expected location of output file for the resultant Schedule
     char *fname="../Output/ARF1_DynamicLS.txt";
 
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
     char hw_constraints[]="**++";
 
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
 }
 int FIR_Util()
 {
@@ -574,6 +680,92 @@ int FIR_Util()
     // Expected output for the resultant Schedule
     char *fname="../Output/FIR2_DynamicLS.txt";
 
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**++";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+}
+int COSINE2_Util()
+{
+    Graph* graph = createGraph(MAX_LT);
+    // Location of the dot File
+    char *location="../benchmark/cosine2.dot";
+    // Name of Benchmark
+    char *type="FIR 2";
+    // Expected output for the resultant Schedule
+    char *fname="../Output/cosine2_DynamicLS.txt";
+
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**++--/!!!";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+}
+int EWF_Util()
+{
+    Graph* graph = createGraph(MAX_LT);
+    // Location of the dot File
+    char *location="../benchmark/ewf.dot";
+    // Name of Benchmark
+    char *type="EWF";
+    // Expected output for the resultant Schedule
+    char *fname="../Output/EWF_DynamicLS.txt";
+
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
+    readFromDot(graph,location);
+
+    // Set HW constraints for benchmarks
+    char hw_constraints[]="**++";
+
+    //Call the Appropriate Scheduling Utility
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+}
+int main()
+{
+    cout<<"\n Main Method Begin\n";
+    /// Implement cost
+
+    //readPower();
+    //HAL_Util();
+    //IIR_Util();
+    //ARF1_Util();
+    //FIR_Util();
+    //COSINE2_Util();
+    EWF_Util();
+
+
+    /**
+    Above are predefined Util for each benchmark. In order to use custom dot file with unique hardware constraints. Refer to Each Utit
+    For Support Required lines are commented out.
+
+    // Graph definition
+    Graph* graph = createGraph(MAX_LT);
+
+    // Location of the dot File
+    char *location="../benchmark/fir2.dot";
+
+    // Name of Benchmark
+    char *type="FIR 2";
+
+    // Expected output for the resultant Schedule
+    char *fname="../Output/FIR2_DynamicLS.txt";
+
+    //Expected location to read Power Config
+    char *power_cfg="cost.txt";
+
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
@@ -581,15 +773,8 @@ int FIR_Util()
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname);
-}
-int main()
-{
-    cout<<"\n Main Method Begin\n";
 
-    HAL_Util();
-    IIR_Util();
-    ARF1_Util();
-    FIR_Util();
+    **/
 
     cout<<"\n Main Method End\n";
 return 0;
