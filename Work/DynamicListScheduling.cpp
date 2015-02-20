@@ -738,7 +738,6 @@ int main()
     cout<<"\n Main Method Begin\n";
     /// Implement cost
 
-    //readPower();
     //HAL_Util();
     //IIR_Util();
     //ARF1_Util();

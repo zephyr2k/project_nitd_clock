@@ -51,7 +51,7 @@ enum{UN_SCH,SCH};
 enum{FAILURE,SUCCESS};
 
 typedef unsigned long long int LL;
-#define MAX_LT 100
+#define MAX_LT 500
 
 using namespace std;
 
