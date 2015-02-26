@@ -44,6 +44,7 @@ op_arrange  <string>    Arrangement of H/W logic
 #include<cstring>
 #include<stdlib.h>
 #include<fstream>
+#include<iomanip>
 
 enum{OP_PRINT,LIST_PRINT,SCHEDULE_OPS_PRINT};
 enum{PRIMARY,SECONDARY};

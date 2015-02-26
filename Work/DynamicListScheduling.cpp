@@ -562,8 +562,8 @@ int disp_Power(Schedule *sch,char *fname)
                 }
                     cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
             }
-            cout<<"\t"<<power;
-            cout<<endl;
+            cout<<right;
+            cout<<setw(20)<<power<<"\n";
 
         }
         cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
@@ -644,7 +644,7 @@ int IIR_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+";
+    char hw_constraints[]="**+A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -739,11 +739,11 @@ int main()
     /// Implement cost
 
     //HAL_Util();
-    //IIR_Util();
+    IIR_Util();
     //ARF1_Util();
     //FIR_Util();
     //COSINE2_Util();
-    EWF_Util();
+    //EWF_Util();
 
 
     /**
