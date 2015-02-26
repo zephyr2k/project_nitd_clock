@@ -427,18 +427,18 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
         for(int k=0;k<(plMain->M);k++)
         {
             PList *temp=plMain->direct[k].head;
-            if(temp)
+            if(temp) //  Goes inside IFF non-null
             {
                 for(int funit=0;funit<(sch->n_ops);funit++)
                 {
                     temp=plMain->direct[k].head;
-                    if(temp!=NULL && temp->op==sch->op_arrange[funit])
+                    if((temp!=NULL && temp->op==sch->op_arrange[funit])||(temp!=NULL && sch->op_arrange[funit]=='A'))
                     {
                         #ifdef DEBUG
                         printf("To Schedule '%c' %d<%d> at step %d\n",temp->op,temp->vertex_no+1,temp->mobility,CStep+1);
                         #endif // DEBUG_
 
-                        PList *tr=new PList(temp->op);
+                        PList *tr=new PList(sch->op_arrange[funit]);
                         tr->mobility=temp->mobility;
                         tr->vertex_no=temp->vertex_no;
                         tr->cStep=CStep;
@@ -665,7 +665,7 @@ int ARF1_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**++";
+    char hw_constraints[]="**+A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -739,8 +739,8 @@ int main()
     /// Implement cost
 
     //HAL_Util();
-    IIR_Util();
-    //ARF1_Util();
+    //IIR_Util();
+    ARF1_Util();
     //FIR_Util();
     //COSINE2_Util();
     //EWF_Util();

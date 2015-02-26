@@ -359,7 +359,7 @@ Graph* createGraph(int V)
         }
     return graph;
 }
-/** Inserts PListNode k in PList p, using 'x' as cStep parameter **/
+/** Inserts PListNode k in Schedule PList p, using 'x' as cStep parameter **/
 PList* insert_PList(PList *p,PList *k,int x)
 {
     int t=0;
