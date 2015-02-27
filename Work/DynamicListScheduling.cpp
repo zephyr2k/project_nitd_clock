@@ -410,6 +410,28 @@ for(int i=0;i<graph->V;i++)
     #endif // DEBUG
 }
 }
+int isFeasable(Schedule *sch,Graph *g)
+{
+    // Array of Ops possible
+    // v - sch
+    // u - Graph
+    vector <int> v(256,0),u(256,0);
+
+    for(int i=0;i<sch->n_ops;i++)
+        v[sch->op_arrange[i]]=1;
+
+    if(v[65]||v[97]) //ALUs
+        return 1;
+
+    for(int i=0;i<g->V;i++)
+        u[g->operation[i]]=1;
+
+    for(int i=0;i<=255;i++)
+    {
+        if(u[i]==1 && v[i]==0)
+            return 0;
+    }
+}
 /// MAIN CORE
 /// Implementation of List Scheduling
 int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
@@ -418,6 +440,8 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
     /// k -- ??
     insert_ready_ops(graph,sch,plMain);
     int CStep=-1;
+    /// Potential Corner Case :
+    /// User inputs AA ( 2 ALU ) as HW Constraints. No specialized Operators
     while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
         #ifdef DEBUG
@@ -543,6 +567,7 @@ int disp_Power(Schedule *sch,char *fname)
         cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
         cout<<"\ncSteps: "<<sch->n_cSteps<<"\t nOps: "<<sch->n_ops<<"    "<<""<<sch->op_arrange<<"\n\t";
         cout<<"\n";
+        int total=0;
         for(int i=0;i<sch->n_cSteps;i++)
         {
             int power=0;
@@ -562,10 +587,11 @@ int disp_Power(Schedule *sch,char *fname)
                 }
                     cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
             }
-            cout<<right;
-            cout<<setw(20)<<power<<"\n";
+            cout<<"\t\t"<<power<<"\n";
+            total+=power;
 
         }
+        cout<<"\n\t\tTotal Power : "<<total<<"\n";
         cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
     return 1;
 }
@@ -587,6 +613,12 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
     // Creates Schedule based on Hardware constraints
     Schedule *currS=new Schedule(1,hw_constraints);
 
+
+    if(!isFeasable(currS,graph))
+    {
+        cout<<"\n\n\t\t INSUFFICIENT HARDWARE CONSTRAINTS. PLEASE CHECK.\n\n";
+        return 0;
+    }
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
@@ -665,7 +697,7 @@ int ARF1_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+A";
+    char hw_constraints[]="AA*";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -697,7 +729,7 @@ int COSINE2_Util()
     // Location of the dot File
     char *location="../benchmark/cosine2.dot";
     // Name of Benchmark
-    char *type="FIR 2";
+    char *type="Cosine 2";
     // Expected output for the resultant Schedule
     char *fname="../Output/cosine2_DynamicLS.txt";
 
@@ -707,7 +739,7 @@ int COSINE2_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**++--/!!!";
+    char hw_constraints[]="!!--++*^A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -740,9 +772,9 @@ int main()
 
     //HAL_Util();
     //IIR_Util();
-    ARF1_Util();
+    //ARF1_Util();
     //FIR_Util();
-    //COSINE2_Util();
+    COSINE2_Util();
     //EWF_Util();
 
 

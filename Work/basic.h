@@ -45,6 +45,7 @@ op_arrange  <string>    Arrangement of H/W logic
 #include<stdlib.h>
 #include<fstream>
 #include<iomanip>
+#include <sstream>
 
 enum{OP_PRINT,LIST_PRINT,SCHEDULE_OPS_PRINT};
 enum{PRIMARY,SECONDARY};
@@ -268,35 +269,18 @@ int readPower(vector < pair<char,int> > cost)
     #ifdef READ_POWER
     ifstream file;	//File Handler
 	file.open("cost.txt", ios::in);
-	char num1[10];
-
     if(file.is_open())
 	{
 		string line;
-		//getline(file, line);
-		//getline(file, line);
 		while(!file.eof())
 		{
 		    getline(file, line);
 		    if(line[0]!='#')
             {
-
-                int k=0,l=0;
-                // Read Value and store in num1
-					for(LL j = 0; j<line.length(); j++)
-					{
-						if(int(line[j])>=48 && int(line[j])<=57)
-						{
-							num1[k]=line[j];
-							k++;
-							if(line[j+1] == ' ')
-							{
-								l=j+1;
-								break;
-							}
-						}
-					}
-					cost.push_back(make_pair(line[0],atoi(num1)));
+					int value=0;char c=' ';
+					stringstream ss(line);
+                    ss>>c>>value;
+					cost.push_back(make_pair(c,value));
             }
 		}
 	}
@@ -305,7 +289,7 @@ int readPower(vector < pair<char,int> > cost)
 	cout<<"\n-----Values of Each operator Read from file------\n";
 	for(int i=0;i<cost.size();i++)
     {
-        cout<<"\n"<<cost[i].first<<"\t"<<cost[i].second;
+        cout<<"\n"<<cost[i].first<<"   "<<cost[i].second;
     }
     cout<<"\n\n------------------------------------------------\n\n";
     #endif // DEBUG

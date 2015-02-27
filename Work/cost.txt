@@ -2,13 +2,16 @@
 #	Lines beginning with # are ignored. Format :
 #		operator<space>cost(int format)
 #	Eg: 	+ 20
+#	! - IMP
+#	Cosine  2 : **++--^!!, **++-AA
+#	EWF 	  : *+AA	,	**++
 #
-- 3
-+ 7
-* 15
-/ 18
-< 12
-> 12
-! 1
-^ 25
+* 20
+/ 20
+< 10
+> 10
+^ 30
 A 40
+- 05
++ 05
+! 07
