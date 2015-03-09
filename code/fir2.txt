@@ -1,0 +1,48 @@
+
+node	alap	asap	prio	oper	pow
+23	1	9	1	+	1
+22	2	8	2	+	1
+16	2	2	3	+	1
+21	3	7	4	+	1
+15	3	2	5	+	1
+8	3	1	6	+	1
+20	4	6	7	+	1
+14	4	2	8	+	1
+7	4	1	9	*	1
+19	5	5	10	*	1
+13	5	2	11	*	1
+6	5	1	12	*	1
+18	6	4	13	*	1
+12	6	2	14	*	1
+5	6	1	15	*	1
+17	7	3	16	*	1
+11	7	2	17	+	1
+4	7	1	18	+	1
+9	8	2	19	+	1
+10	8	2	20	+	1
+3	8	1	21	+	1
+1	9	1	22	+	1
+2	9	1	23	+	1
+
+LIST BASED SCHEDULE for resource constraint **+-<>i^mmasle
+
+
+s1	power = 1	2(+)  
+s2	power = 2	1(+)  10(*)  
+s3	power = 2	3(+)  9(*)  
+s4	power = 2	4(+)  11(*)  
+s5	power = 2	12(*)  17(+)  
+s6	power = 1	5(+)  
+s7	power = 2	13(*)  18(+)  
+s8	power = 1	6(+)  
+s9	power = 2	14(*)  19(+)  
+s10	power = 1	7(+)  
+s11	power = 2	15(*)  20(+)  
+s12	power = 1	8(+)  
+s13	power = 2	16(*)  21(+)  
+s14	power = 1	22(+)  
+s15	power = 1	23(+)  
+
+		total power = 23
+
+	Time to find priority and list based schedule is 0.34002 sec

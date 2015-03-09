@@ -1,0 +1,12 @@
+Schedule Format :
+Control Step :  Vertex Number (Type of Operation)
+**************************************
+HAL 	 Hardware Constraints : ***+-<
+**************************************
+
+s1 :	power : 65	1 (*), 2 (*), 6 (*), 10 (+), 
+s2 :	power : 70	3 (*), 7 (*), 8 (*), 11 (<), 
+s3 :	power : 10	9 (+), 4 (-), 
+s4 :	power : 5	5 (-), 
+
+ Total Power : 150

@@ -1,0 +1,22 @@
+digraph in {
+    node [fontcolor=white,style=filled,color="160,60,176"];
+    1 [label = mul];
+    2 [label = mul];
+    3 [label = mul];
+    4 [label = mul];
+    5 [label = mul];
+    6 [label = mul];
+    7 [label = sub];
+    8 [label = sub];
+    9 [label = add];
+    10 [label = add];
+    11 [label = les];
+1 -> 5
+2 -> 5
+3 -> 6
+4 -> 9
+5 -> 7
+6 -> 8
+7 -> 8
+10 -> 11
+}

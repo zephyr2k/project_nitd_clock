@@ -1,0 +1,70 @@
+
+node	alap	asap	prio	oper	pow
+33	1	14	1	ADD	5
+34	1	14	2	ADD	5
+30	1	13	3	ADD	5
+29	1	12	4	ADD	5
+14	1	8	5	ADD	5
+31	2	13	6	MUL	20
+32	2	13	7	MUL	20
+26	2	12	8	ADD	5
+25	2	11	9	ADD	5
+11	2	7	10	ADD	5
+27	3	12	11	ADD	5
+28	3	12	12	ADD	5
+22	3	11	13	MUL	20
+21	3	10	14	ADD	5
+23	4	11	15	MUL	20
+24	4	11	16	ADD	5
+18	4	10	17	ADD	5
+19	5	10	18	ADD	5
+20	5	10	19	ADD	5
+1	5	1	20	ADD	5
+16	6	9	21	ADD	5
+17	6	9	22	MUL	20
+13	7	8	23	ADD	5
+15	7	8	24	ADD	5
+10	8	7	25	MUL	20
+12	8	7	26	ADD	5
+8	9	6	27	MUL	20
+9	9	6	28	MUL	20
+6	10	5	29	ADD	5
+7	10	5	30	ADD	5
+5	11	4	31	ADD	5
+4	12	3	32	ADD	5
+2	12	1	33	ADD	5
+3	13	2	34	ADD	5
+
+LIST BASED SCHEDULE for resource constraint 	ADD => 1	ALU => 2	MUL => 1
+
+
+
+s1	power = 5	2(ADD)  
+s2	power = 5	1(ADD)  
+s3	power = 5	3(ADD)  
+s4	power = 5	4(ADD)  
+s5	power = 5	5(ADD)  
+s6	power = 20	7(MUL)  
+s7	power = 25	6(MUL)  9(ADD)  
+s8	power = 5	8(ADD)  
+s9	power = 5	12(ADD)  
+s10	power = 25	10(ADD)  15(MUL)  
+s11	power = 25	13(MUL)  17(ADD)  
+s12	power = 5	16(ADD)  
+s13	power = 5	20(ADD)  
+s14	power = 5	19(ADD)  
+s15	power = 5	18(ADD)  
+s16	power = 25	22(MUL)  24(ADD)  
+s17	power = 25	23(ADD)  28(MUL)  
+s18	power = 25	21(ADD)  27(MUL)  
+s19	power = 25	11(ADD)  25(MUL)  
+s20	power = 5	26(ADD)  
+s21	power = 5	32(ADD)  
+s22	power = 5	31(ADD)  
+s23	power = 5	14(ADD)  
+s24	power = 5	29(ADD)  
+s25	power = 5	30(ADD)  
+s26	power = 5	34(ADD)  
+s27	power = 5	33(ADD)  
+
+		total power = 290

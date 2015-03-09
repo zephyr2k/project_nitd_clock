@@ -1,0 +1,13 @@
+Schedule Format :
+Control Step :  Vertex Number (Type of Operation)
+**************************************
+IIR 2 	 Hardware Constraints : **++
+**************************************
+
+s1 :	power : 40	3 (*), 4 (*), 
+s2 :	power : 45	1 (*), 2 (*), 7 (+), 
+s3 :	power : 25	5 (*), 6 (+), 
+s4 :	power : 5	8 (+), 
+s5 :	power : 5	9 (+), 
+
+ Total Power : 120

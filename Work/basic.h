@@ -142,6 +142,7 @@ typedef struct Schedule
     int n_ops;              // No of operators i.e. Hardware logic
     ScheduleHead *pOps;     // Pointer to each type of operation and its schedule in control steps
     PList *tail;
+    int pow_per_cStep[MAX_LT];
     string op_arrange;      // HW operators arrangement
     Schedule(int n_cS,string op)
     {

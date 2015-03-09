@@ -217,24 +217,6 @@ else if(i==1)
     }
     cout<< "\n\n-------------Graph Printing End---------------\n\n";
 }
-void createdot(struct Graph* graph,int V)
-{
-    FILE *fp;
-    char ch;
-    fp=fopen("graph.dot","w");
-    fprintf(fp, "digraph "" {\n");
-    for (int v = 0; v < graph->V; ++v)
-    {
-        struct AdjListNode* pCrawl = graph->su[v].head;
-        while (pCrawl)
-        {
-            fprintf(fp, "%d -> %d",v+1,(pCrawl->dest)+1);
-            pCrawl = pCrawl->next;
-        }
-    }
-    fprintf(fp, "}");
-    fclose(fp);
-}
 /*
 TRUE - Remains Inside
 FALSE - BREAKS OUT
@@ -289,15 +271,19 @@ void createSchDot(Schedule *sch,char *param,char *fname)
                     temp=temp->next;
                 }
             }
+            int sum=0;
         for(int i=0;i<sch->n_cSteps;i++)
         {
             fprintf(fp, "s%d :\t",i+1);
+            fprintf(fp, "power : %d\t",sch->pow_per_cStep[i]);
+            sum+=sch->pow_per_cStep[i];
             for(int j=0;j<vtx[i].size();j++)
             {
                 fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
             }
             fprintf(fp, "\n");
         }
+    fprintf(fp, "\n Total Power : %d\n",sum);
     /// Edit End
     #endif // SCH_2
     fclose(fp);
@@ -506,7 +492,6 @@ int cleanUp(Schedule *s)
 int disp_Power(Schedule *sch,char *fname)
 {
     vector < pair<char,int> > cost;
-        // Reads only if define
 
     ifstream file;	//File Handler
 	file.open(fname, ios::in);
@@ -514,30 +499,15 @@ int disp_Power(Schedule *sch,char *fname)
     if(file.is_open())
 	{
 		string line;
-		//getline(file, line);
-		//getline(file, line);
 		while(!file.eof())
 		{
 		    getline(file, line);
 		    if(line[0]!='#')
             {
-
-                int k=0,l=0;
-                // Read Value and store in num1
-					for(LL j = 0; j<line.length(); j++)
-					{
-						if(int(line[j])>=48 && int(line[j])<=57)
-						{
-							num1[k]=line[j];
-							k++;
-							if(line[j+1] == ' ')
-							{
-								l=j+1;
-								break;
-							}
-						}
-					}
-					cost.push_back(make_pair(line[0],atoi(num1)));
+                int value=0;char c=' ';
+                stringstream ss(line);
+                ss>>c>>value;
+                cost.push_back(make_pair(c,value));
             }
 		}
 	}
@@ -587,6 +557,7 @@ int disp_Power(Schedule *sch,char *fname)
                 }
                     cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
             }
+            sch->pow_per_cStep[i]=power;
             cout<<"\t\t"<<power<<"\n";
             total+=power;
 
@@ -614,11 +585,12 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
     Schedule *currS=new Schedule(1,hw_constraints);
 
 
-    if(!isFeasable(currS,graph))
+    /*if(!isFeasable(currS,graph))
     {
         cout<<"\n\n\t\t INSUFFICIENT HARDWARE CONSTRAINTS. PLEASE CHECK.\n\n";
         return 0;
     }
+    */
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
@@ -628,7 +600,6 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
     #else
         disp_Power(currS,power_cfg);
     #endif
-
 
     // Converts 0 indexed schedule to 1 indexed schedule
     //cleanUp(currS);
@@ -647,7 +618,7 @@ int HAL_Util()
     // Name of Benchmark
     char *type="HAL";
     // Expected output for the resultant Schedule
-    char *fname="../Output/HAL_DynamicLS.txt";
+    char *fname="../Output/HAL_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -655,7 +626,7 @@ int HAL_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+-<";
+    char hw_constraints[]="***+-<";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -668,7 +639,7 @@ int IIR_Util()
     // Name of Benchmark
     char *type="IIR 2";
     // Expected output for the resultant Schedule
-    char *fname="../Output/IIR_DynamicLS.txt";
+    char *fname="../Output/IIR_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -676,7 +647,7 @@ int IIR_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+A";
+    char hw_constraints[]="***+++";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -689,7 +660,7 @@ int ARF1_Util()
     // Name of Benchmark
     char *type="ARF 1";
     // Expected location of output file for the resultant Schedule
-    char *fname="../Output/ARF1_DynamicLS.txt";
+    char *fname="../Output/ARF1_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -697,7 +668,7 @@ int ARF1_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="AA*";
+    char hw_constraints[]="****+++";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -710,7 +681,7 @@ int FIR_Util()
     // Name of Benchmark
     char *type="FIR 2";
     // Expected output for the resultant Schedule
-    char *fname="../Output/FIR2_DynamicLS.txt";
+    char *fname="../Output/FIR2_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -718,7 +689,7 @@ int FIR_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**++";
+    char hw_constraints[]="*++";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -731,7 +702,7 @@ int COSINE2_Util()
     // Name of Benchmark
     char *type="Cosine 2";
     // Expected output for the resultant Schedule
-    char *fname="../Output/cosine2_DynamicLS.txt";
+    char *fname="../Output/cosine2_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -739,7 +710,7 @@ int COSINE2_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="!!--++*^A";
+    char hw_constraints[]="**+-^^!";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -752,7 +723,7 @@ int EWF_Util()
     // Name of Benchmark
     char *type="EWF";
     // Expected output for the resultant Schedule
-    char *fname="../Output/EWF_DynamicLS.txt";
+    char *fname="../Output/EWF_DynamicLS_test.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -774,8 +745,8 @@ int main()
     //IIR_Util();
     //ARF1_Util();
     //FIR_Util();
-    COSINE2_Util();
-    //EWF_Util();
+    //COSINE2_Util();
+    EWF_Util();
 
 
     /**
