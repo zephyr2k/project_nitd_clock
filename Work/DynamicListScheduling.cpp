@@ -723,7 +723,7 @@ int EWF_Util()
     // Name of Benchmark
     char *type="EWF";
     // Expected output for the resultant Schedule
-    char *fname="../Output/EWF_DynamicLS_test.txt";
+    char *fname="../Output/EWF_DynamicLS.txt";
 
     //Expected location to read Power Config
     char *power_cfg="cost.txt";
@@ -731,7 +731,7 @@ int EWF_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**++";
+    char hw_constraints[]="*+*";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
