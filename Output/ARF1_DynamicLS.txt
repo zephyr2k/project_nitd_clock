@@ -1,9 +1,0 @@
-Schedule Format :
-Control Step :  Vertex Number (Type of Operation)
-**************************************
-ARF 1 	 Hardware Constraints : AA*
-**************************************
-
-s1 :	3 (A), 4 (A), 5 (*), 
-s2 :	6 (A), 1 (A), 2 (*), 
-s3 :	7 (A), 8 (A), 
