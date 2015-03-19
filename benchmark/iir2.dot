@@ -1,14 +1,14 @@
 digraph iir {
     node [fontcolor=white,style=filled,color="160,60,176"];
-    1 [label = mul];
-    2 [label = mul];
-    3 [label = mul];
-    4 [label = mul];
-    5 [label = mul];
-    6 [label = add];
-    7 [label = add];
-    8 [label = add];
-    9 [label = add];
+    01 [label = mul];
+    02 [label = mul];
+    03 [label = mul];
+    04 [label = mul];
+    05 [label = mul];
+    06 [label = add];
+    07 [label = add];
+    08 [label = add];
+    09 [label = add];
     01 ->  06 [name=16];
     02 ->  06 [name=14];
     03 ->  07 [name=20];

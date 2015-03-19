@@ -1,14 +1,14 @@
 digraph arf {
     node [fontcolor=white,style=filled,color=blue2];
-     1 [label = MUL ];
-     2 [label = MUL ];
-     3 [label = MUL ];
-     4 [label = MUL ];
-     5 [label = MUL ];
-     6 [label = MUL ];
-     7 [label = MUL ];
-     8 [label = MUL ];
-     9 [label = ADD ];
+     01 [label = MUL ];
+     02 [label = MUL ];
+     03 [label = MUL ];
+     04 [label = MUL ];
+     05 [label = MUL ];
+     06 [label = MUL ];
+     07 [label = MUL ];
+     08 [label = MUL ];
+     09 [label = ADD ];
      10 [label = ADD ];
      11 [label = ADD ];
      12 [label = ADD ];

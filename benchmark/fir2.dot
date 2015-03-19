@@ -1,14 +1,14 @@
 digraph fir1 {
     node [fontcolor=white,style=filled,color="160,60,12"];
-    1 [label = add];
-    2 [label = add];
-    3 [label = add];
-    4 [label = add];
-    5 [label = add];
-    6 [label = add];
-    7 [label = add];
-    8 [label = add];
-    9 [label = mul];
+    01 [label = add];
+    02 [label = add];
+    03 [label = add];
+    04 [label = add];
+    05 [label = add];
+    06 [label = add];
+    07 [label = add];
+    08 [label = add];
+    09 [label = mul];
     10 [label = mul];
     11 [label = mul];
     12 [label = mul];

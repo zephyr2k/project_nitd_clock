@@ -1,14 +1,14 @@
 digraph ewf {
     node [fontcolor=white,style=filled,color=blue2];
-     1 [label = ADD ];
-     2 [label = ADD ];
-     3 [label = ADD ];
-     4 [label = ADD ];
-     5 [label = ADD ];
-     6 [label = MUL ];
-     7 [label = MUL ];
-     8 [label = ADD ];
-     9 [label = ADD ];
+     01 [label = ADD ];
+     02 [label = ADD ];
+     03 [label = ADD ];
+     04 [label = ADD ];
+     05 [label = ADD ];
+     06 [label = MUL ];
+     07 [label = MUL ];
+     08 [label = ADD ];
+     09 [label = ADD ];
      10 [label = ADD ];
      11 [label = ADD ];
      12 [label = ADD ];

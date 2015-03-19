@@ -1,14 +1,14 @@
 digraph hal1 {
     node [fontcolor=white,style=filled,color="160,60,176"];
-    1 [label = mul];
-    2 [label = mul];
-    3 [label = mul];
-    4 [label = sub];
-    5 [label = sub];
-    6 [label = mul];
-    7 [label = mul];
-    8 [label = mul];
-    9 [label = add];
+    01 [label = mul];
+    02 [label = mul];
+    03 [label = mul];
+    04 [label = sub];
+    05 [label = sub];
+    06 [label = mul];
+    07 [label = mul];
+    08 [label = mul];
+    09 [label = add];
     10 [label = add];
     11 [label = les];
     01 -> 03 [name=16];

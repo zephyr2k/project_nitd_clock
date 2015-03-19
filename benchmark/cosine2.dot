@@ -1,14 +1,14 @@
 digraph cosine2 {
     node [fontcolor=white,style=filled,color="160,60,176"];
-    1 [label = imp];
-    2 [label = imp];
-    3 [label = sub];
-    4 [label = imp];
-    5 [label = imp];
-    6 [label = sub];
-    7 [label = imp];
-    8 [label = imp];
-    9 [label = sub];
+    01 [label = imp];
+    02 [label = imp];
+    03 [label = sub];
+    04 [label = imp];
+    05 [label = imp];
+    06 [label = sub];
+    07 [label = imp];
+    08 [label = imp];
+    09 [label = sub];
     10 [label = imp];
     11 [label = imp];
     12 [label = sub];
