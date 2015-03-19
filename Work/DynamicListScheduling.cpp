@@ -401,20 +401,20 @@ int isFeasable(Schedule *sch,Graph *g)
     // Array of Ops possible
     // v - sch
     // u - Graph
-    vector <int> v(256,0),u(256,0);
+    vector <int> u(256,0),v(256,0);
 
     for(int i=0;i<sch->n_ops;i++)
-        v[sch->op_arrange[i]]=1;
+        u[sch->op_arrange[i]]=1;
 
-    if(v[65]||v[97]) //ALUs
+    if(u[65]||u[97]) //ALUs
         return 1;
 
     for(int i=0;i<g->V;i++)
-        u[g->operation[i]]=1;
+        v[g->operation[i]]=1;
 
     for(int i=0;i<=255;i++)
     {
-        if(u[i]==1 && v[i]==0)
+        if(v[i]==1 && u[i]==0)
             return 0;
     }
 }
@@ -585,12 +585,12 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
     Schedule *currS=new Schedule(1,hw_constraints);
 
 
-    /*if(!isFeasable(currS,graph))
+    if(!isFeasable(currS,graph))
     {
         cout<<"\n\n\t\t INSUFFICIENT HARDWARE CONSTRAINTS. PLEASE CHECK.\n\n";
         return 0;
     }
-    */
+
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
@@ -710,7 +710,7 @@ int COSINE2_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+-^^!";
+    char hw_constraints[]="**++AA";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -731,7 +731,7 @@ int EWF_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="*+*";
+    char hw_constraints[]="*+A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -745,8 +745,8 @@ int main()
     //IIR_Util();
     //ARF1_Util();
     //FIR_Util();
-    //COSINE2_Util();
-    EWF_Util();
+    COSINE2_Util();
+    //EWF_Util();
 
 
     /**
