@@ -422,22 +422,28 @@ int isFeasable(Schedule *sch,Graph *g)
 /// Implementation of List Scheduling
 int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
 {
+
+    int maxALU=0,ALUSch=0;
+    for(int i=0;i<sch->n_ops;i++)
+    {
+        if(sch->op_arrange[i]=='A')
+            maxALU++;
+    }
     /// m -- No of PList operators
     /// k -- ??
-    //cout<< "IRO 0\n";
     insert_ready_ops(graph,sch,plMain);
 
     int CStep=-1;
     /// Potential Corner Case :
     /// User inputs AA ( 2 ALU ) as HW Constraints. No specialized Operators
-    cout<< "IRO 1\n";
     while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
-        cout<< "IRO 2\n";
+        ALUSch=0;
         #ifdef DEBUG
         plMain->toString();
         #endif // DEBUG_
         CStep+=1;
+
         for(int k=0;k<(plMain->M);k++)
         {
             PList *temp=plMain->direct[k].head;
@@ -446,8 +452,9 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
                 for(int funit=0;funit<(sch->n_ops);funit++)
                 {
                     temp=plMain->direct[k].head;
-                    if(temp!=NULL && (temp->op==sch->op_arrange[funit] || sch->op_arrange[funit]=='A'))
+                    if(temp!=NULL && (temp->op==sch->op_arrange[funit] || (sch->op_arrange[funit]=='A' && ALUSch<=maxALU)))
                     {
+                        ALUSch++;
                         #ifdef DEBUG
                         printf("To Schedule '%c' %d<%d> at step %d\n",temp->op,temp->vertex_no+1,temp->mobility,CStep+1);
                         #endif // DEBUG_
@@ -466,12 +473,12 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
         }
 
         insert_ready_ops(graph,sch,plMain);
+        sch->n_cSteps=CStep+1;
         #ifdef DEBUG
         sch->toString();
         #endif // DEBUG_
-    }
 
-    sch->n_cSteps=CStep+1;
+    }
     return SUCCESS;
 }
 
@@ -570,14 +577,36 @@ int disp_Power(Schedule *sch,char *fname)
         cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
     return 1;
 }
+//Computes distinct HW from graph
+string computeD(Graph *graph)
+{
+    string hw="";
+    vector<char> A(255,' ');
+    for(int i=0;graph->operation[i]!='E';i++)
+    {
+        A[graph->operation[i]]=graph->operation[i];
+    }
+    for(int i=0;i<=255;i++)
+    {
+        if(A[i]!=' ')
+        {
+            hw+=(char)A[i];
+            cout<<hw<<"\n";
+        }
+    }
+    return hw;
+}
 /// ListScheduling Utility that takes as input the DFG, Hardware Constraints, and the Namr of the Benchmarks (optional)
 int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,char* power_cfg)
 {
     // Print Graph
     printGraph(graph,1);
 
+    // Computes Distinct Hardware types from graph, solves the ALU problem
+    string hw=computeD(graph);
+
     //Creates PListMain based on Hardware Constraints
-    PListMain *plM=new PListMain(hw_constraints);
+    PListMain *plM=new PListMain(hw);
 
     //Computes ASAP,ALAP, & Mobility, integrates them into graph
     asap_alap(graph);
@@ -735,7 +764,7 @@ int EWF_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="+A";
+    char hw_constraints[]="*AA";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);

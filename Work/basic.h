@@ -96,19 +96,14 @@ typedef struct PListMain
     int M; /// No of Unique Operation ----NOT---- no of vertex
     char op_type[MAX_LT];
     PListHead *direct;
-    PListMain(char *ops)
+    PListMain(string ops)
     {
-        int c=0;
-        while(ops[c])
-            c++;
-        M=c;
+        M=ops.length();
         direct=(PListHead *) malloc(M * sizeof(PListHead));
         for(int i=0;i<M;i++)
         {
-            //graph->su[i].head = NULL;
             direct[i].head=NULL;
             op_type[i]=ops[i];
-            //op_type=ops;
         }
     }
 
