@@ -1,0 +1,12 @@
+Schedule Format :
+Control Step :  Vertex Number (Type of Operation)
+**************************************
+EWF 	 Hardware Constraints : +A
+**************************************
+
+s1 :	power : 45	2 (+), 1 (A), 
+s2 :	power : 5	3 (+), 
+s3 :	power : 5	4 (+), 
+s4 :	power : 5	5 (+), 
+
+ Total Power : 60

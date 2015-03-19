@@ -424,12 +424,16 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
 {
     /// m -- No of PList operators
     /// k -- ??
+    //cout<< "IRO 0\n";
     insert_ready_ops(graph,sch,plMain);
+
     int CStep=-1;
     /// Potential Corner Case :
     /// User inputs AA ( 2 ALU ) as HW Constraints. No specialized Operators
+    cout<< "IRO 1\n";
     while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
     {
+        cout<< "IRO 2\n";
         #ifdef DEBUG
         plMain->toString();
         #endif // DEBUG_
@@ -442,7 +446,7 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
                 for(int funit=0;funit<(sch->n_ops);funit++)
                 {
                     temp=plMain->direct[k].head;
-                    if((temp!=NULL && temp->op==sch->op_arrange[funit])||(temp!=NULL && sch->op_arrange[funit]=='A'))
+                    if(temp!=NULL && (temp->op==sch->op_arrange[funit] || sch->op_arrange[funit]=='A'))
                     {
                         #ifdef DEBUG
                         printf("To Schedule '%c' %d<%d> at step %d\n",temp->op,temp->vertex_no+1,temp->mobility,CStep+1);
@@ -590,7 +594,7 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
         cout<<"\n\n\t\t INSUFFICIENT HARDWARE CONSTRAINTS. PLEASE CHECK.\n\n";
         return 0;
     }
-
+    //cout<< "LS Util\n";
     // Schedules based on hardware availablity
     ListScheduling(graph,currS,plM);
 
@@ -710,7 +714,7 @@ int COSINE2_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**++AA";
+    char hw_constraints[]="**+-!^A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -731,7 +735,7 @@ int EWF_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="*+A";
+    char hw_constraints[]="+A";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -745,11 +749,12 @@ int main()
     //IIR_Util();
     //ARF1_Util();
     //FIR_Util();
-    COSINE2_Util();
-    //EWF_Util();
+    //COSINE2_Util();
+    EWF_Util();
 
 
     /**
+
     Above are predefined Util for each benchmark. In order to use custom dot file with unique hardware constraints. Refer to Each Utit
     For Support Required lines are commented out.
 
