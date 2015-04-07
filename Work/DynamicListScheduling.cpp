@@ -418,12 +418,43 @@ int isFeasable(Schedule *sch,Graph *g)
             return 0;
     }
 }
+// Checks whats operations ALU can perform
+int canALUPerform(char p,vector <char> V)
+{
+    for(int i=0;i<V.size();i++)
+    {
+        if(p==V[i])
+            return 1;
+    }
+return 0;
+}
+
 /// MAIN CORE
 /// Implementation of List Scheduling
-int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
+int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain,char *ALU)
 {
-
     int maxALU=0,ALUSch=0;
+
+    // Reads ALU operation allowed from file
+    vector <char> Aop;
+    ifstream file;	//File Handler
+	file.open(ALU, ios::in);
+	char num1[10];
+    if(file.is_open())
+	{
+		string line;
+		while(!file.eof())
+		{
+		    getline(file, line);
+		    if(line[0]!='#')
+            {
+                Aop.push_back(line[0]);
+            }
+		}
+	}
+	file.close();
+
+    // Checks no of ALU provided in H/W constraints
     for(int i=0;i<sch->n_ops;i++)
     {
         if(sch->op_arrange[i]=='A')
@@ -452,7 +483,7 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain)
                 for(int funit=0;funit<(sch->n_ops);funit++)
                 {
                     temp=plMain->direct[k].head;
-                    if(temp!=NULL && (temp->op==sch->op_arrange[funit] || (sch->op_arrange[funit]=='A' && ALUSch<=maxALU)))
+                    if(temp!=NULL && (temp->op==sch->op_arrange[funit] || (sch->op_arrange[funit]=='A' && ALUSch<=maxALU && canALUPerform(temp->op,Aop))))
                     {
                         ALUSch++;
                         #ifdef DEBUG
@@ -597,7 +628,7 @@ string computeD(Graph *graph)
     return hw;
 }
 /// ListScheduling Utility that takes as input the DFG, Hardware Constraints, and the Namr of the Benchmarks (optional)
-int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,char* power_cfg)
+int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,char* power_cfg,char *ALU_File)
 {
     // Print Graph
     printGraph(graph,1);
@@ -623,9 +654,9 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
         cout<<"\n\n\t\t INSUFFICIENT HARDWARE CONSTRAINTS. PLEASE CHECK.\n\n";
         return 0;
     }
-    //cout<< "LS Util\n";
+
     // Schedules based on hardware availablity
-    ListScheduling(graph,currS,plM);
+    ListScheduling(graph,currS,plM,ALU_File);
 
     // Prints the final Schedule
     #ifndef READ_POWER
@@ -661,8 +692,11 @@ int HAL_Util()
     // Set HW constraints for benchmarks
     char hw_constraints[]="***+-<";
 
+    //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int IIR_Util()
 {
@@ -682,8 +716,11 @@ int IIR_Util()
     // Set HW constraints for benchmarks
     char hw_constraints[]="***+++";
 
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int ARF1_Util()
 {
@@ -703,8 +740,11 @@ int ARF1_Util()
     // Set HW constraints for benchmarks
     char hw_constraints[]="****+++";
 
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int FIR_Util()
 {
@@ -724,8 +764,11 @@ int FIR_Util()
     // Set HW constraints for benchmarks
     char hw_constraints[]="*++";
 
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int COSINE2_Util()
 {
@@ -743,10 +786,13 @@ int COSINE2_Util()
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="*+AA";
+    char hw_constraints[]="**AAA";
+
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
 
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int EWF_Util()
 {
@@ -766,8 +812,11 @@ int EWF_Util()
     // Set HW constraints for benchmarks
     char hw_constraints[]="*AA";
 
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 }
 int main()
 {
@@ -807,8 +856,11 @@ int main()
     // Set HW constraints for benchmarks
     char hw_constraints[]="**+++";
 
+     //Calls appropriate ALU config to read the operation it can perform
+    char *alu="../configs/ALU.txt";
+
     //Call the Appropriate Scheduling Utility
-    ListSchedulingUtil(graph,hw_constraints,type,fname);
+    ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg,alu);
 
     **/
 
