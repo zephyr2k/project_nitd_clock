@@ -654,7 +654,7 @@ int HAL_Util()
     char *fname="../Output/HAL_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
@@ -675,7 +675,7 @@ int IIR_Util()
     char *fname="../Output/IIR_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
@@ -696,7 +696,7 @@ int ARF1_Util()
     char *fname="../Output/ARF1_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
@@ -717,7 +717,7 @@ int FIR_Util()
     char *fname="../Output/FIR2_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
@@ -738,12 +738,12 @@ int COSINE2_Util()
     char *fname="../Output/cosine2_DynamicLS_set2.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
     // Set HW constraints for benchmarks
-    char hw_constraints[]="**+-!^A";
+    char hw_constraints[]="*+AA";
 
     //Call the Appropriate Scheduling Utility
     ListSchedulingUtil(graph,hw_constraints,type,fname,power_cfg);
@@ -759,7 +759,7 @@ int EWF_Util()
     char *fname="../Output/EWF_DynamicLS.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 
@@ -778,8 +778,8 @@ int main()
     //IIR_Util();
     //ARF1_Util();
     //FIR_Util();
-    //COSINE2_Util();
-    EWF_Util();
+    COSINE2_Util();
+    //EWF_Util();
 
 
     /**
@@ -800,7 +800,7 @@ int main()
     char *fname="../Output/FIR2_DynamicLS.txt";
 
     //Expected location to read Power Config
-    char *power_cfg="cost.txt";
+    char *power_cfg="../configs/cost.txt";
 
     readFromDot(graph,location);
 

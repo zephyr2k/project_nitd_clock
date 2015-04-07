@@ -1,0 +1,12 @@
+#
+# Lines begining with # are excluded
+# All operation that ALU can performed are mentioned here
+#
+#
++
+-
+%
+=
+/
+!
+^
