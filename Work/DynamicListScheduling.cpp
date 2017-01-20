@@ -34,35 +34,35 @@ Graph* delete_Succ(Graph *graph,int fromDel,int toDel)
     AdjListNode *curr=graph->pre[fromDel].head;
     AdjListNode *prev=curr;
     if(curr==NULL)
-        {
+    {
         curr=NULL;
 
-        }
+    }
     else if(curr->dest==toDel)
-        {
+    {
         /// Not Working
         /// FIXED
         graph->pre[fromDel].head=graph->pre[fromDel].head->next;
-        }
+    }
     else
     {
-    prev=curr;
-    curr=curr->next;
-
-    while(curr!=NULL)
-    {
-        if(curr->dest==toDel)
-        {
-            prev->next=curr->next;
-            curr->next=NULL;
-            break;
-        }
-
         prev=curr;
         curr=curr->next;
+
+        while(curr!=NULL)
+        {
+            if(curr->dest==toDel)
+            {
+                prev->next=curr->next;
+                curr->next=NULL;
+                break;
+            }
+
+            prev=curr;
+            curr=curr->next;
+        }
     }
-    }
-return graph;
+    return graph;
 }
 
 
@@ -98,7 +98,7 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
             }
             //del all ref of curr
 
-             graph->stat[v]=0;
+            graph->stat[v]=0;
              /***
                 Above removal from list successfull .
                 Below adding the removed nodes to PList
@@ -129,9 +129,9 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
 
                         if(t->mobility<pCrawl->mobility||t->vertex_no<pCrawl->vertex_no)
                         {
-                        t->next=pCrawl;
-                        plMain->direct[i].head=t;
-                        break;
+                            t->next=pCrawl;
+                            plMain->direct[i].head=t;
+                            break;
                         }
                     }
                     while(pCrawl->next)
@@ -153,7 +153,7 @@ int insert_ready_ops(Graph *graph,Schedule *s,PListMain *plMain)
                     {
                         pCrawl->next=t;
                     }
-                break;
+                    break;
                 }
             }
         }
@@ -166,28 +166,28 @@ void printGraph(Graph* graph,int i=0)
 {
     int v;
     cout<< "\n\n-------------Graph Printing Start----------------\n";
-if(i==0)
+    if(i==0)
     {
-    cout<<" Vertex No : Mobility Operation\n";
-    for (v = 0; v < graph->V; ++v)
-    {
-        if(graph->stat[v]!=0)
-        cout<<v<<" : "<< graph->mob[v] <<" "<<graph->operation[v]<<"\n";
-    }
-    }
-else if(i==1)
-    {
-    for (v = 0; v < graph->V; ++v)
-    {
-         if(graph->stat[v]!=0)
-         {
-        AdjListNode* pCrawl = graph->su[v].head;
-        printf("\n Successor list of vertex %d: head ", v+1);
-        while (pCrawl)
+        cout<<" Vertex No : Mobility Operation\n";
+        for (v = 0; v < graph->V; ++v)
         {
-            printf("-> %d", pCrawl->dest+1);
-            pCrawl = pCrawl->next;
+            if(graph->stat[v]!=0)
+                cout<<v<<" : "<< graph->mob[v] <<" "<<graph->operation[v]<<"\n";
         }
+    }
+    else if(i==1)
+    {
+        for (v = 0; v < graph->V; ++v)
+        {
+           if(graph->stat[v]!=0)
+           {
+            AdjListNode* pCrawl = graph->su[v].head;
+            printf("\n Successor list of vertex %d: head ", v+1);
+            while (pCrawl)
+            {
+                printf("-> %d", pCrawl->dest+1);
+                pCrawl = pCrawl->next;
+            }
         }
 
     }
@@ -197,25 +197,25 @@ else if(i==1)
     for (v = 0; v < graph->V; ++v)
     {
         if(graph->stat[v]!=0)
-         {
-        AdjListNode* pCrawl = graph->pre[v].head;
-        printf("\n Predecesor list of vertex %d : head ", v+1);
-
-        while (pCrawl)
         {
-            printf("-> %d", pCrawl->dest+1);
-            pCrawl = pCrawl->next;
-        }
+            AdjListNode* pCrawl = graph->pre[v].head;
+            printf("\n Predecesor list of vertex %d : head ", v+1);
+
+            while (pCrawl)
+            {
+                printf("-> %d", pCrawl->dest+1);
+                pCrawl = pCrawl->next;
+            }
         }
         //printf("\n");
     }
-    }
-    cout<<"\n ________________________\n";
-    for (v = 0; v < graph->V; ++v)
-    {
-        cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
-    }
-    cout<< "\n\n-------------Graph Printing End---------------\n\n";
+}
+cout<<"\n ________________________\n";
+for (v = 0; v < graph->V; ++v)
+{
+    cout<<"\n"<<v+1<<" assigned operation : "<<graph->operation[v];
+}
+cout<< "\n\n-------------Graph Printing End---------------\n\n";
 }
 /*
 TRUE - Remains Inside
@@ -260,29 +260,29 @@ void createSchDot(Schedule *sch,char *param,char *fname)
     fprintf(fp,"\n**************************************\n\n");
     vector< vector<int> > vtx(MAX_LT);
     vector< char > op(MAX_LT,'E');
-         for(int j=0;j<sch->n_ops;j++)
-            {
-                PList *temp=sch->pOps[j].head;
-                while(temp!=NULL && temp->cStep>=0)
-                {
-                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
-                    vtx[temp->cStep].push_back(temp->vertex_no);
-                    op[temp->vertex_no]=temp->op;
-                    temp=temp->next;
-                }
-            }
-            int sum=0;
-        for(int i=0;i<sch->n_cSteps;i++)
+    for(int j=0;j<sch->n_ops;j++)
+    {
+        PList *temp=sch->pOps[j].head;
+        while(temp!=NULL && temp->cStep>=0)
         {
-            fprintf(fp, "s%d :\t",i+1);
-            fprintf(fp, "power : %d\t",sch->pow_per_cStep[i]);
-            sum+=sch->pow_per_cStep[i];
-            for(int j=0;j<vtx[i].size();j++)
-            {
-                fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
-            }
-            fprintf(fp, "\n");
+                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
+            vtx[temp->cStep].push_back(temp->vertex_no);
+            op[temp->vertex_no]=temp->op;
+            temp=temp->next;
         }
+    }
+    int sum=0;
+    for(int i=0;i<sch->n_cSteps;i++)
+    {
+        fprintf(fp, "s%d :\t",i+1);
+        fprintf(fp, "power : %d\t",sch->pow_per_cStep[i]);
+        sum+=sch->pow_per_cStep[i];
+        for(int j=0;j<vtx[i].size();j++)
+        {
+            fprintf(fp, "%d (%c), ",vtx[i][j]+1,op[vtx[i][j]]);
+        }
+        fprintf(fp, "\n");
+    }
     fprintf(fp, "\n Total Power : %d\n",sum);
     /// Edit End
     #endif // SCH_2
@@ -294,107 +294,107 @@ void createSchDot(Schedule *sch,char *param,char *fname)
 }
 int asap_alap(Graph *graph)
 {
-int t;
-vector<int> as(MAX_LT,0),al(MAX_LT,0);
-stack<int> f;
-int te[100];
-int s=0;
-for (int v = 0; v < graph->V; ++v)
-{
-    AdjListNode* pCrawl = graph->pre[v].head;
-    if(!pCrawl)
+    int t;
+    vector<int> as(MAX_LT,0),al(MAX_LT,0);
+    stack<int> f;
+    int te[100];
+    int s=0;
+    for (int v = 0; v < graph->V; ++v)
     {
-        as[v]=1;
-        f.push(v);
-    }
-}
-while(!f.empty())
-{
-    AdjListNode* pCrawl = graph->su[f.top()].head;
-    t=int(f.top());
-    f.pop();
-    while (pCrawl)
-    {
-        if(pCrawl->dest)
+        AdjListNode* pCrawl = graph->pre[v].head;
+        if(!pCrawl)
         {
-            if(as[int(pCrawl->dest)]==0)
-                as[int(pCrawl->dest)]=as[t]+1;
-            else
-            {
-                if(as[int(pCrawl->dest)]<as[t]+1)
-                as[int(pCrawl->dest)]=as[t]+1;
-            }
-            f.push(int(pCrawl->dest));
+            as[v]=1;
+            f.push(v);
         }
+    }
+    while(!f.empty())
+    {
+        AdjListNode* pCrawl = graph->su[f.top()].head;
+        t=int(f.top());
+        f.pop();
+        while (pCrawl)
+        {
+            if(pCrawl->dest)
+            {
+                if(as[int(pCrawl->dest)]==0)
+                    as[int(pCrawl->dest)]=as[t]+1;
+                else
+                {
+                    if(as[int(pCrawl->dest)]<as[t]+1)
+                        as[int(pCrawl->dest)]=as[t]+1;
+                }
+                f.push(int(pCrawl->dest));
+            }
             pCrawl = pCrawl->next;
-    }
-    if(f.empty())
-        break;
-}
-for (int v = 0; v < graph->V; ++v)
-{
-    AdjListNode* pCrawl = graph->su[v].head;
-    if(!pCrawl)
-    {
-        al[v]=MAX_LT;
-        f.push(v);
-    }
-}
-while(!f.empty())
-{
-    AdjListNode* pCrawl = graph->pre[f.top()].head;
-    t=int(f.top());
-    f.pop();
-    while (pCrawl)
-    {
-        if(pCrawl->dest)
-        {
-            if(al[int(pCrawl->dest)]==0)
-                al[int(pCrawl->dest)]=al[t]-1;
-            else
-            {
-                if(al[int(pCrawl->dest)]>al[t]-1)
-                    al[int(pCrawl->dest)]=al[t]-1;
-            }
-            f.push(int(pCrawl->dest));
         }
-        pCrawl = pCrawl->next;
+        if(f.empty())
+            break;
     }
-    if(f.empty())
-        break;
-}
-int m=MAX_LT*10;
-for(int i=0;i<graph->V;i++)
-{
-    if(al[i]!=0 && m>al[i])
-        m=al[i];
-}
-al[0]=MAX_LT*10;
-AdjListNode* pCrawl = graph->su[0].head;
-if(pCrawl->dest)
-    al[0]=al[pCrawl->dest]-1;
-m=MAX_LT*10;
-for(int i=0;i<graph->V;i++)
-{
-    if(m>al[i])
-        m=al[i];
-}
-for(int i=0;i<graph->V;i++)
-{
-    al[i]=al[i]-m+1;
-}
+    for (int v = 0; v < graph->V; ++v)
+    {
+        AdjListNode* pCrawl = graph->su[v].head;
+        if(!pCrawl)
+        {
+            al[v]=MAX_LT;
+            f.push(v);
+        }
+    }
+    while(!f.empty())
+    {
+        AdjListNode* pCrawl = graph->pre[f.top()].head;
+        t=int(f.top());
+        f.pop();
+        while (pCrawl)
+        {
+            if(pCrawl->dest)
+            {
+                if(al[int(pCrawl->dest)]==0)
+                    al[int(pCrawl->dest)]=al[t]-1;
+                else
+                {
+                    if(al[int(pCrawl->dest)]>al[t]-1)
+                        al[int(pCrawl->dest)]=al[t]-1;
+                }
+                f.push(int(pCrawl->dest));
+            }
+            pCrawl = pCrawl->next;
+        }
+        if(f.empty())
+            break;
+    }
+    int m=MAX_LT*10;
+    for(int i=0;i<graph->V;i++)
+    {
+        if(al[i]!=0 && m>al[i])
+            m=al[i];
+    }
+    al[0]=MAX_LT*10;
+    AdjListNode* pCrawl = graph->su[0].head;
+    if(pCrawl->dest)
+        al[0]=al[pCrawl->dest]-1;
+    m=MAX_LT*10;
+    for(int i=0;i<graph->V;i++)
+    {
+        if(m>al[i])
+            m=al[i];
+    }
+    for(int i=0;i<graph->V;i++)
+    {
+        al[i]=al[i]-m+1;
+    }
 #ifdef DEBUG
     cout<<"\nInside ASAL ALAP : Vertex Number (Mobility)\n";
 #endif // DEBUG
-for(int i=0;i<graph->V;i++)
-{
-    graph->mob[i]=abs(al[i]-as[i]);
-    graph->asap[i]=as[i];
-    graph->alap[i]=al[i];
+    for(int i=0;i<graph->V;i++)
+    {
+        graph->mob[i]=abs(al[i]-as[i]);
+        graph->asap[i]=as[i];
+        graph->alap[i]=al[i];
     #ifdef DEBUG
         printf(" %d < %d >\n",i+1,abs(al[i]-as[i]));
     #endif // DEBUG
-}
+    }
 }
 int isFeasable(Schedule *sch,Graph *g)
 {
@@ -426,7 +426,7 @@ int canALUPerform(char p,vector <char> V)
         if(p==V[i])
             return 1;
     }
-return 0;
+    return 0;
 }
 
 /// MAIN CORE
@@ -438,33 +438,33 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain,char *ALU)
     // Reads ALU operation allowed from file
     vector <char> Aop;
     ifstream file;	//File Handler
-	file.open(ALU, ios::in);
-	char num1[10];
+    file.open(ALU, ios::in);
+    char num1[10];
     if(file.is_open())
-	{
-		string line;
-		while(!file.eof())
-		{
-		    getline(file, line);
-		    if(line[0]!='#')
-            {
-                Aop.push_back(line[0]);
-            }
-		}
-	}
-	file.close();
+    {
+      string line;
+      while(!file.eof())
+      {
+          getline(file, line);
+          if(line[0]!='#')
+          {
+            Aop.push_back(line[0]);
+        }
+    }
+}
+file.close();
 
     // Checks no of ALU provided in H/W constraints
-    for(int i=0;i<sch->n_ops;i++)
-    {
-        if(sch->op_arrange[i]=='A')
-            maxALU++;
-    }
+for(int i=0;i<sch->n_ops;i++)
+{
+    if(sch->op_arrange[i]=='A')
+        maxALU++;
+}
     /// m -- No of PList operators
     /// k -- ??
-    insert_ready_ops(graph,sch,plMain);
+insert_ready_ops(graph,sch,plMain);
 
-    int CStep=-1;
+int CStep=-1;
     /// Potential Corner Case :
     /// User inputs AA ( 2 ALU ) as HW Constraints. No specialized Operators
     while(PListEmptyCheck(plMain))//TRUE (Remains Inside), FALSE (BREAKS OUT)
@@ -496,8 +496,8 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain,char *ALU)
                         tr->cStep=CStep;
                         schedule_op(sch,tr,CStep,funit);
 
-                            temp = plMain->direct[k].head->next;
-                            plMain->direct[k].head=temp;
+                        temp = plMain->direct[k].head->next;
+                        plMain->direct[k].head=temp;
                     }
                 }
             }
@@ -516,19 +516,19 @@ int ListScheduling(Graph *graph,Schedule *sch,PListMain *plMain,char *ALU)
 // Adjustments to vertex number and cSteps
 int cleanUp(Schedule *s)
 {
-   for(int j=0;j<s->n_ops;j++)
-            {
-                PList *temp=s->pOps[j].head;
-                while(temp!=NULL)
-                {
-                    if(temp->cStep!=-1)
-                    {
-                    temp->cStep+=1;
-                    temp->vertex_no+=1;
-                    }
-                    temp=temp->next;
-                }
-            }
+ for(int j=0;j<s->n_ops;j++)
+ {
+    PList *temp=s->pOps[j].head;
+    while(temp!=NULL)
+    {
+        if(temp->cStep!=-1)
+        {
+            temp->cStep+=1;
+            temp->vertex_no+=1;
+        }
+        temp=temp->next;
+    }
+}
 }
 /// Displays Schedule taking Power into account
 int disp_Power(Schedule *sch,char *fname)
@@ -536,77 +536,77 @@ int disp_Power(Schedule *sch,char *fname)
     vector < pair<char,int> > cost;
 
     ifstream file;	//File Handler
-	file.open(fname, ios::in);
-	char num1[10];
+    file.open(fname, ios::in);
+    char num1[10];
     if(file.is_open())
-	{
-		string line;
-		while(!file.eof())
-		{
-		    getline(file, line);
-		    if(line[0]!='#')
-            {
-                int value=0;char c=' ';
-                stringstream ss(line);
-                ss>>c>>value;
-                cost.push_back(make_pair(c,value));
-            }
-		}
-	}
-	file.close();
-	#ifdef DEBUG
-	cout<<"\n-----Values of Each operator Read from file------\n";
-	for(int i=0;i<cost.size();i++)
     {
-        cout<<"\n"<<cost[i].first<<"\t"<<cost[i].second;
-    }
-    cout<<"\n\n------------------------------------------------\n\n";
-    #endif // DEBUG
-        vector< vector<int> > vtx(MAX_LT);
-        vector< char > op(MAX_LT,'E');
-         for(int j=0;j<sch->n_ops;j++)
-            {
-                PList *temp=sch->pOps[j].head;
-                while(temp!=NULL && temp->cStep>=0)
-                {
-                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
-                    vtx[temp->cStep].push_back(temp->vertex_no);
-                    op[temp->vertex_no]=temp->op;
-                    temp=temp->next;
-                }
-            }
-        cout<<"\n\n---------------- FINAL SCHEDULE BEGIN ----------------\n\n";
-        cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
-        cout<<"\ncSteps: "<<sch->n_cSteps<<"\t nOps: "<<sch->n_ops<<"    "<<""<<sch->op_arrange<<"\n\t";
-        cout<<"\n";
-        int total=0;
-        for(int i=0;i<sch->n_cSteps;i++)
-        {
-            int power=0;
-            cout<<"s"<<i+1<<" :\t";
-            for(int j=0;j<vtx[i].size();j++)
-            {
-
-                for(int k=0;k<cost.size();k++)
-                {
-
-                    if(cost[k].first==op[vtx[i][j]])
-                    {
-                       // cout<<"\n"<<cost[k].first<<"\n";
-                        power+=cost[k].second;
-                        break;
-                    }
-                }
-                    cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
-            }
-            sch->pow_per_cStep[i]=power;
-            cout<<"\t\t"<<power<<"\n";
-            total+=power;
-
+      string line;
+      while(!file.eof())
+      {
+          getline(file, line);
+          if(line[0]!='#')
+          {
+            int value=0;char c=' ';
+            stringstream ss(line);
+            ss>>c>>value;
+            cost.push_back(make_pair(c,value));
         }
-        cout<<"\n\t\tTotal Power : "<<total<<"\n";
-        cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
-    return 1;
+    }
+}
+file.close();
+	#ifdef DEBUG
+cout<<"\n-----Values of Each operator Read from file------\n";
+for(int i=0;i<cost.size();i++)
+{
+    cout<<"\n"<<cost[i].first<<"\t"<<cost[i].second;
+}
+cout<<"\n\n------------------------------------------------\n\n";
+    #endif // DEBUG
+vector< vector<int> > vtx(MAX_LT);
+vector< char > op(MAX_LT,'E');
+for(int j=0;j<sch->n_ops;j++)
+{
+    PList *temp=sch->pOps[j].head;
+    while(temp!=NULL && temp->cStep>=0)
+    {
+                    //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
+        vtx[temp->cStep].push_back(temp->vertex_no);
+        op[temp->vertex_no]=temp->op;
+        temp=temp->next;
+    }
+}
+cout<<"\n\n---------------- FINAL SCHEDULE BEGIN ----------------\n\n";
+cout<<"VERTEX NUMBER < MOBILITY > CONTROL STEP\n";
+cout<<"\ncSteps: "<<sch->n_cSteps<<"\t nOps: "<<sch->n_ops<<"    "<<""<<sch->op_arrange<<"\n\t";
+cout<<"\n";
+int total=0;
+for(int i=0;i<sch->n_cSteps;i++)
+{
+    int power=0;
+    cout<<"s"<<i+1<<" :\t";
+    for(int j=0;j<vtx[i].size();j++)
+    {
+
+        for(int k=0;k<cost.size();k++)
+        {
+
+            if(cost[k].first==op[vtx[i][j]])
+            {
+                       // cout<<"\n"<<cost[k].first<<"\n";
+                power+=cost[k].second;
+                break;
+            }
+        }
+        cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
+    }
+    sch->pow_per_cStep[i]=power;
+    cout<<"\t\t"<<power<<"\n";
+    total+=power;
+
+}
+cout<<"\n\t\tTotal Power : "<<total<<"\n";
+cout<<"\n----------------- FINAL SCHEDULE END -----------------\n\n";
+return 1;
 }
 //Computes distinct HW from graph
 string computeD(Graph *graph)
@@ -660,9 +660,9 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
 
     // Prints the final Schedule
     #ifndef READ_POWER
-        currS->toString();
+    currS->toString();
     #else
-        disp_Power(currS,power_cfg);
+    disp_Power(currS,power_cfg);
     #endif
 
     // Converts 0 indexed schedule to 1 indexed schedule
@@ -672,7 +672,7 @@ int ListSchedulingUtil(Graph *graph,char *hw_constraints,char *type,char *fname,
     createSchDot(currS,type,fname);
 
 
-return SUCCESS;
+    return SUCCESS;
 }
 int HAL_Util()
 {
@@ -865,5 +865,5 @@ int main()
     **/
 
     cout<<"\n Main Method End\n";
-return 0;
+    return 0;
 }
