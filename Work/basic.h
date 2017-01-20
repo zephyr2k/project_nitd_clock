@@ -107,7 +107,7 @@ typedef struct PListMain
         }
     }
 
- int toString()
+    int toString()
     {
         cout<<"\n\n--------PLIST CONTENTS START------------\n\n";
         for(int i=0;i<M;i++)
@@ -167,48 +167,48 @@ typedef struct Schedule
         cout<<"\ncSteps: "<<n_cSteps<<"\t nOps: "<<n_ops<<"    "<<""<<op_arrange<<"\n\t";
         cout<<"\n";
         #ifndef SCH_2
-            for(int j=0;j<n_ops;j++)
-            {
-                cout<<op_arrange[j]<<"\t";
+        for(int j=0;j<n_ops;j++)
+        {
+            cout<<op_arrange[j]<<"\t";
                 //cout<<"\n";
-                PList *temp=pOps[j].head;
-               int ctr=1;
+            PList *temp=pOps[j].head;
+            int ctr=1;
 
-                if(temp->cStep!=1)
+            if(temp->cStep!=1)
+            {
+                while(ctr<=temp->cStep)
                 {
-                        while(ctr<=temp->cStep)
-                        {
-                        temp->toString(1);
+                    temp->toString(1);
                         //cout<<"  ";
-                        ctr+=1;
-                        }
-                }
-                //cout<<ctr<<"\n";
-                while(temp!=NULL && temp->cStep>=0)
-                {
-
-                    temp->toString();
-                        cout<<temp->cStep;
-                    cout<<" --> ";
-                    temp=temp->next;
                     ctr+=1;
                 }
-                 cout<<"\n";
             }
+                //cout<<ctr<<"\n";
+            while(temp!=NULL && temp->cStep>=0)
+            {
+
+                temp->toString();
+                cout<<temp->cStep;
+                cout<<" --> ";
+                temp=temp->next;
+                ctr+=1;
+            }
+            cout<<"\n";
+        }
         #else
         vector< vector<int> > vtx(MAX_LT);
         vector< char > op(MAX_LT,'E');
-         for(int j=0;j<n_ops;j++)
+        for(int j=0;j<n_ops;j++)
+        {
+            PList *temp=pOps[j].head;
+            while(temp!=NULL && temp->cStep>=0)
             {
-                PList *temp=pOps[j].head;
-                while(temp!=NULL && temp->cStep>=0)
-                {
                     //cout<<"\n Pushed "<<temp->vertex_no<<" to cStep : "<<temp->cStep<<"\n";
-                    vtx[temp->cStep].push_back(temp->vertex_no);
-                    op[temp->vertex_no]=temp->op;
-                    temp=temp->next;
-                }
+                vtx[temp->cStep].push_back(temp->vertex_no);
+                op[temp->vertex_no]=temp->op;
+                temp=temp->next;
             }
+        }
         for(int i=0;i<n_cSteps;i++)
         {
 
@@ -217,7 +217,7 @@ typedef struct Schedule
             {
 
 
-                    cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
+                cout<<vtx[i][j]+1<<" "<<op[vtx[i][j]]<<",";
             }
 
             cout<<endl;
@@ -264,33 +264,33 @@ int readPower(vector < pair<char,int> > cost)
     // Reads only if define
     #ifdef READ_POWER
     ifstream file;	//File Handler
-	file.open("cost.txt", ios::in);
+    file.open("cost.txt", ios::in);
     if(file.is_open())
-	{
-		string line;
-		while(!file.eof())
-		{
-		    getline(file, line);
-		    if(line[0]!='#')
-            {
-					int value=0;char c=' ';
-					stringstream ss(line);
-                    ss>>c>>value;
-					cost.push_back(make_pair(c,value));
-            }
-		}
-	}
-	file.close();
-	#ifdef DEBUG
-	cout<<"\n-----Values of Each operator Read from file------\n";
-	for(int i=0;i<cost.size();i++)
     {
-        cout<<"\n"<<cost[i].first<<"   "<<cost[i].second;
-    }
-    cout<<"\n\n------------------------------------------------\n\n";
+      string line;
+      while(!file.eof())
+      {
+          getline(file, line);
+          if(line[0]!='#')
+          {
+           int value=0;char c=' ';
+           stringstream ss(line);
+           ss>>c>>value;
+           cost.push_back(make_pair(c,value));
+       }
+   }
+}
+file.close();
+	#ifdef DEBUG
+cout<<"\n-----Values of Each operator Read from file------\n";
+for(int i=0;i<cost.size();i++)
+{
+    cout<<"\n"<<cost[i].first<<"   "<<cost[i].second;
+}
+cout<<"\n\n------------------------------------------------\n\n";
     #endif // DEBUG
     #endif // READ_POWER
-    return SUCCESS;
+return SUCCESS;
 }
 /*** Allocates mobility to vertices after computation ***/
 int alloc_op_mbty(Graph* graph,char *op)
@@ -336,7 +336,7 @@ Graph* createGraph(int V)
         graph->stat[i]=1;
         graph->alap[i]=-1;
         graph->asap[i]=-1;
-        }
+    }
     return graph;
 }
 /** Inserts PListNode k in Schedule PList p, using 'x' as cStep parameter **/
@@ -360,11 +360,11 @@ PList* insert_PList(PList *p,PList *k,int x)
         }
         t=1;
     }
-        PList *prev=p;
-        PList *curr=p->next;
+    PList *prev=p;
+    PList *curr=p->next;
         /*Code to insert a node by comparing cStep*/
-        while(curr!=NULL)
-        {
+    while(curr!=NULL)
+    {
             if(curr->cStep>x)// IMP
             {
                 prev->next=k;
@@ -375,61 +375,61 @@ PList* insert_PList(PList *p,PList *k,int x)
             curr=curr->next;
 
         }
-    if(t==0)
-    {
-        prev->next=k;
+        if(t==0)
+        {
+            prev->next=k;
+        }
+        k->cStep=x;
+        return p;
     }
-    k->cStep=x;
-    return p;
-}
 
 /** Takes a Schedule , inserts tk at Cstep of funit hardware **/
-int schedule_op(Schedule *S,PList *tk,int Cstep,int funit)
-{
+    int schedule_op(Schedule *S,PList *tk,int Cstep,int funit)
+    {
         int loc=funit;
         if(loc>=0)
         {
             S->pOps[loc].head=insert_PList(S->pOps[loc].head,tk,Cstep);
             return SUCCESS;
         }
-    return FAILURE;
-}
-void addEdge(Graph* graph, int src, int dest)
-{
+        return FAILURE;
+    }
+    void addEdge(Graph* graph, int src, int dest)
+    {
     // Add an edge from src to dest.  A new node is added to the adjacency
     // list of src.  The node is added at the begining
-    AdjListNode* newNode = newAdjListNode(dest);
-    newNode->next = graph->su[src].head;
-    graph->su[src].head = newNode;
+        AdjListNode* newNode = newAdjListNode(dest);
+        newNode->next = graph->su[src].head;
+        graph->su[src].head = newNode;
 
     // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre[dest].head;
-    graph->pre[dest].head = newNode;
+        newNode = newAdjListNode(src);
+        newNode->next = graph->pre[dest].head;
+        graph->pre[dest].head = newNode;
 
     // Since graph is undirected, add an edge from dest to src also
-    newNode = newAdjListNode(src);
-    newNode->next = graph->pre_non_d[dest].head;
-    graph->pre_non_d[dest].head = newNode;
-}
-int readFromDot(Graph *graph,char *location)
-{
-    int global_count=0;
+        newNode = newAdjListNode(src);
+        newNode->next = graph->pre_non_d[dest].head;
+        graph->pre_non_d[dest].head = newNode;
+    }
+    int readFromDot(Graph *graph,char *location)
+    {
+        int global_count=0;
     ifstream file;	//File Handler
 	file.open(location, ios::in);	//Accessing the input file. It is in the .dot format. *Needs to be changed according to the input path of the file*
 	char num1[10];
 	char num2[10];
     if(file.is_open())
-	{
-		string line;
-		getline(file, line);
-		getline(file, line);
-		while(!file.eof())
-		{
-			getline(file, line);
+    {
+      string line;
+      getline(file, line);
+      getline(file, line);
+      while(!file.eof())
+      {
+         getline(file, line);
 
-			for(LL i=0; i<line.length(); i++)
-			{
+         for(LL i=0; i<line.length(); i++)
+         {
 				if(line[i] == '=' && line[i+1] == ' ')	//Condition for checking and accessing the lines containing the node information of the graphs.
 				{
 					// Reading Vertex Number
@@ -467,9 +467,9 @@ int readFromDot(Graph *graph,char *location)
                     else if(str.compare("imp")==0||str.compare("IMP")==0||line[i+3]=='!')
                         graph->operation[v_no]='!';
                     // Add custom operation here
-					global_count++;
+                    global_count++;
 
-				}
+                }
 				else if(line[i] == '-' && line[i+1] == '>')	//Condition for accessing the lines where links are defined.
 				{
 					int k=0,l=0;
@@ -500,8 +500,8 @@ int readFromDot(Graph *graph,char *location)
 					}
 					cout<<"\nAdding edge between "<<(atoi(num1)-1)<<" and "<<(atoi(num2)-1)<<"\n";
                     addEdge(graph,(atoi(num1)-1),(atoi(num2)-1));
-				}
-			}
+                }
+            }
 
 		}  // While Loop for file reading
 	}
@@ -516,13 +516,13 @@ int sHasV(Schedule *s,int v)
     //s->toString();
     for(int i=0;i<s->n_ops;i++)
     {
-    PList *pC=s->pOps[i].head;
-    while(pC)
-    {
-        if(v==pC->vertex_no)
-            return SUCCESS;
-        pC=pC->next;
-    }
+        PList *pC=s->pOps[i].head;
+        while(pC)
+        {
+            if(v==pC->vertex_no)
+                return SUCCESS;
+            pC=pC->next;
+        }
     }
     return FAILURE;
 }
@@ -530,20 +530,20 @@ int sHasV(Schedule *s,int v)
 int checkPred(Graph *graph,int v,Schedule *s)
 {
     //return true for empty predecessors
-     AdjListNode* p = graph->pre_non_d[v].head;
-     if(p==NULL)
-     {
-        return SUCCESS;
-     }
-     while(p)
-        {
-            if(sHasV(s,p->dest)==FAILURE)
-                {
-                return FAILURE;
-                }
-        p=p->next;
-        }
+   AdjListNode* p = graph->pre_non_d[v].head;
+   if(p==NULL)
+   {
     return SUCCESS;
+}
+while(p)
+{
+    if(sHasV(s,p->dest)==FAILURE)
+    {
+        return FAILURE;
+    }
+    p=p->next;
+}
+return SUCCESS;
 }
 
 
